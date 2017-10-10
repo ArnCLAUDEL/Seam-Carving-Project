@@ -1,1 +1,1 @@
-from tkinter import *
+__all__ = ["frame"]

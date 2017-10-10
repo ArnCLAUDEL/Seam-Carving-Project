@@ -3,12 +3,13 @@ from tkinter.filedialog import askopenfilename
 
 class Frame:
 
-    def __init__(self, frame):
+    def __init__(self, frame, core):
         self.frame = frame
-        self.initialize()
+        self.core = core
+        self.__initialize()
         
 
-    def initialize(self):
+    def __initialize(self):
         self.frame.title("machinerie")
         
         self.load_button = Button(self.frame, text="Load", command=self.load)
@@ -19,7 +20,8 @@ class Frame:
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
 
         if file:
-            print(file)
+            print("File selected")
+            core.setFile(file)
 
 root = Tk()
 frame = Frame(root)
