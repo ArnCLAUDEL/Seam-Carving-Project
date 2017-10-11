@@ -1,4 +1,4 @@
-from cv2 import *
+import cv2
 
 class Image:
 
@@ -7,5 +7,4 @@ class Image:
         self.__initialize()
 
     def __initialize(self):
-        self.grid = imread(self.path)
-        print("File loaded")
+        self.grid = cv2.imread(self.path)

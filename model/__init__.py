@@ -1,1 +1,1 @@
-__all__ = ["core", "image"]
+__all__ = ["core", "image", "seamCarvingUtil"]
