@@ -1,3 +1,5 @@
+import model.image as img
+
 class Core:
 
     def __init__(self):
@@ -5,4 +7,5 @@ class Core:
 
     def setImage(self, path):
         print("File requested")
-        self.image = Image(path)
+        self.image = img.Image(path)
+

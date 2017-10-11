@@ -1,4 +1,4 @@
-from tkinter import *
+import tkinter
 from tkinter.filedialog import askopenfilename
 
 class Frame:
@@ -12,17 +12,21 @@ class Frame:
     def __initialize(self):
         self.frame.title("machinerie")
         
-        self.load_button = Button(self.frame, text="Load", command=self.load)
+        self.load_button = tkinter.Button(self.frame, text="Load", command=self.load)
         self.load_button.pack()
-        
+
+        self.label = tkinter.StringVar()
+        self.label.set("NONE")
+        self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
+        self.current_file_label.pack()
 
     def load(self):
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
 
         if file:
-            print("File selected")
-            core.setFile(file)
+            print("Picture selected")
+            self.core.setImage(file)
+            self.updateLabel()
 
-root = Tk()
-frame = Frame(root)
-root.mainloop()
+    def updateLabel(self):
+        self.label.set(self.core.image.path)
