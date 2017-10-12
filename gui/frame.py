@@ -19,7 +19,7 @@ class Frame:
         self.label = tkinter.StringVar()
         self.label.set("NONE")
 
-        self.test_button = tkinter.Button(self.frame, text="Test", command=self.energyTest)
+        self.test_button = tkinter.Button(self.frame, text="Test", command=self.test)
         self.test_button.pack()
 
         self.test_image = tkinter.Label(self.frame, image=None)
@@ -42,5 +42,13 @@ class Frame:
         self.current_image = self.core.image.getAsITK()
         self.test_image.configure(image=self.current_image)
 
-    def energyTest(self):
-        self.core.energyOf(2,3)
+    def test(self):
+        pl = self.core.stupid_seam_finder()
+        self.test_canvas = tkinter.Canvas(self.frame, width=self.core.w(), height=self.core.h())
+        self.test_canvas.pack()
+        self.test_canvas.create_image(0,0,image=self.current_image)
+        
+        for p in pl["path"]:
+            self.test_canvas.create_oval(p[0]-1,p[1]-1,p[0]+1,p[1]+1)
+        
+        
