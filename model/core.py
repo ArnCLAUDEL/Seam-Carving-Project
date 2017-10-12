@@ -9,7 +9,7 @@ class Core:
 
     def setImage(self, path):
         self.image = img.Image(path)
-        self.energyComputer = ec.EnergyComputer(self.image.grid)
+        self.energyComputer = ec.EnergyComputer(self.image)
 
     def checkImage(f):
         def check(self, *args, **kwargs):
