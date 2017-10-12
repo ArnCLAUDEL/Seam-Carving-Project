@@ -11,12 +11,6 @@ class Core:
         self.image = img.Image(path)
         self.energyComputer = ec.EnergyComputer(self.image.grid)
 
-    def w(self):
-        return self.image.w
-
-    def h(self):
-        return self.image.h
-    
     def checkImage(f):
         def check(self, *args, **kwargs):
             if(self.image is None):
@@ -25,6 +19,15 @@ class Core:
                 return f(self, *args, **kwargs)
         return check
 
+    @checkImage
+    def w(self):
+        return self.image.w
+
+    @checkImage
+    def h(self):
+        return self.image.h
+    
+    
     
     @checkImage
     def energyOf(self, x, y):    

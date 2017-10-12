@@ -10,8 +10,8 @@ class Image:
 
     def __initialize(self):
         self.grid = cv2.imread(self.path)
-        self.w = len(self.grid)
-        self.h = len(self.grid[0])
+        self.w = len(self.grid[0])
+        self.h = len(self.grid)
 
     
     def getAsITK(self):

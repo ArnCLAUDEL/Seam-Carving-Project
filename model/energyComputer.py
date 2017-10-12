@@ -62,6 +62,8 @@ class EnergyComputer:
         return pe
     
     def energy(self, x, y):
+        if(x == 0 or y == 0):
+            return math.inf
         try:
             res = self.energyComputed[(x,y)]
             return res

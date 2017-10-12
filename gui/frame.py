@@ -23,7 +23,6 @@ class Frame:
         self.test_button.pack()
 
         self.test_image = tkinter.Label(self.frame, image=None)
-        self.test_image.pack()
         
         self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
         self.current_file_label.pack()
@@ -35,20 +34,19 @@ class Frame:
             print("Picture selected")
             self.core.setImage(file)
             print("Picture loaded")
-            self.updateLabel()
+            self.update()
 
-    def updateLabel(self):
+    def update(self):
         self.label.set(self.core.image.path)
         self.current_image = self.core.image.getAsITK()
-        self.test_image.configure(image=self.current_image)
+        self.test_canvas = tkinter.Canvas(self.frame, width=self.core.w(), height=self.core.h())
+        self.test_canvas.pack()
+        self.test_canvas.create_image(0,0, image=self.current_image, anchor="nw")
 
     def test(self):
         pl = self.core.stupid_seam_finder()
-        self.test_canvas = tkinter.Canvas(self.frame, width=self.core.w(), height=self.core.h())
-        self.test_canvas.pack()
-        self.test_canvas.create_image(0,0,image=self.current_image)
         
         for p in pl["path"]:
-            self.test_canvas.create_oval(p[0]-1,p[1]-1,p[0]+1,p[1]+1)
+            self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
         
         
