@@ -48,8 +48,6 @@ class Frame:
     def test(self):
         #print(self.core.image.grid)
         #print(self.core.image.grid[0])
-        self.core.image.grid[0] = [2, 3]
-        return
         pl = self.core.stupid_seam_finder()
 
         for p in pl["path"]:
