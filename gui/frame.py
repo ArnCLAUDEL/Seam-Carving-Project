@@ -27,6 +27,8 @@ class Frame:
         self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
         self.current_file_label.pack()
 
+        self.frame.mainloop()
+
     def load(self):
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
 
@@ -44,8 +46,12 @@ class Frame:
         self.test_canvas.create_image(0,0, image=self.current_image, anchor="nw")
 
     def test(self):
+        #print(self.core.image.grid)
+        #print(self.core.image.grid[0])
+        self.core.image.grid[0] = [2, 3]
+        return
         pl = self.core.stupid_seam_finder()
-        
+
         for p in pl["path"]:
             self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
         
