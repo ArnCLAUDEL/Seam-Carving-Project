@@ -29,6 +29,8 @@ class Image:
         return pimgtk.PhotoImage(newImage)
 
     def removeVerticalSeam(self, path):
-        x_grid = [p[0] for p in path]
-        self.grid = numpy.delete(self.grid, x_grid, 1)
+        ndarrays = []
+        for p in path:
+            ndarrays.append(numpy.delete(self.grid[p[1]], p[0], 0))
+        self.grid = numpy.array(ndarrays)
         self.updateCoordinates()
