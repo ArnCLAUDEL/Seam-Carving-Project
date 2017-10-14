@@ -30,7 +30,9 @@ class Image:
 
     def removeVerticalSeam(self, path):
         ndarrays = []
+        ndarrays.append(numpy.delete(self.grid[path[0][1]], path[0][0], 0))
         for p in path:
             ndarrays.append(numpy.delete(self.grid[p[1]], p[0], 0))
+        ndarrays.append(numpy.delete(self.grid[path[len(path)-1][1]], path[len(path)-1][0], 0))
         self.grid = numpy.array(ndarrays)
         self.updateCoordinates()

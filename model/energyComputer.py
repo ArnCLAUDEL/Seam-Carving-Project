@@ -36,7 +36,7 @@ class EnergyComputer:
             x = i-1
             seam_energy = 0
             path = []
-            for j in range(1, self.image.h -2):
+            for j in range(1, self.image.h -1):
                 y = j
                 e1 = self.energy(x-1, y)
                 e2 = self.energy(x, y)
