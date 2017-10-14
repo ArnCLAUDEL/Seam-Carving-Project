@@ -22,7 +22,11 @@ class Frame:
         self.test_button = tkinter.Button(self.frame, text="Test", command=self.test)
         self.test_button.pack()
 
-        self.test_image = tkinter.Label(self.frame, image=None)
+        self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
+        self.refresh_button.pack()
+                
+        self.test_canvas = tkinter.Canvas(self.frame, width=1200, height=1200)
+        self.test_canvas.pack()
         
         self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
         self.current_file_label.pack()
@@ -39,11 +43,9 @@ class Frame:
             self.update()
 
     def update(self):
-        self.label.set(self.core.image.path)
+        self.label.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
         self.current_image = self.core.image.getAsITK()
-        self.test_canvas = tkinter.Canvas(self.frame, width=self.core.w(), height=self.core.h())
-        self.test_canvas.pack()
-        self.test_canvas.create_image(0,0, image=self.current_image, anchor="nw")
+        self.test_canvas.create_image(0,0, image=self.current_image, anchor ="nw")
 
     def test(self):
         #print(self.core.image.grid)
@@ -53,4 +55,5 @@ class Frame:
         for p in pl["path"]:
             self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
         
+        self.core.image.removeVerticalSeam(pl["path"])
         
