@@ -44,16 +44,18 @@ class Frame:
 
     def update(self):
         self.label.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
-        self.current_image = self.core.image.getAsITK()
+        self.current_image = self.core.getImage()
         self.test_canvas.create_image(0,0, image=self.current_image, anchor ="nw")
 
     def test(self):
         #print(self.core.image.grid)
         #print(self.core.image.grid[0])
-        pl = self.core.stupid_seam_finder()
+        for i in range(0,5):
+            pl = self.core.stupid_seam_finder()
 
-        for p in pl["path"]:
-            self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
-        
-        self.core.image.removeVerticalSeam(pl["path"])
+            for p in pl["path"]:
+                self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
+            
+            self.core.removeVerticalSeam(pl["path"])
+            self.update
         

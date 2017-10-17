@@ -12,7 +12,6 @@ class Image:
     def __initialize(self):
         self.grid = cv2.imread(self.path)
         self.updateCoordinates()
-        print(self.w, self.h)
 
     def updateCoordinates(self):
         self.w = len(self.grid[0])

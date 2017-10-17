@@ -5,7 +5,6 @@ class Core:
 
     def __init__(self):
         self.image = None
-        self.ec = None
 
     def setImage(self, path):
         self.image = img.Image(path)
@@ -18,6 +17,9 @@ class Core:
             else:
                 return f(self, *args, **kwargs)
         return check
+
+    def getImage(self):
+        return self.image.getAsITK()
 
     @checkImage
     def w(self):
@@ -36,3 +38,8 @@ class Core:
     @checkImage
     def stupid_seam_finder(self):
         return self.energyComputer.stupid_seam_finder()
+
+    @checkImage
+    def removeVerticalSeam(self, path):
+        self.image.removeVerticalSeam(path)
+        self.energyComputer = ec.EnergyComputer(self.image)
