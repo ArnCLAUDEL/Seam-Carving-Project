@@ -42,4 +42,4 @@ class Core:
     @checkImage
     def removeVerticalSeam(self, path):
         self.image.removeVerticalSeam(path)
-        self.energyComputer = ec.EnergyComputer(self.image)
+        self.energyComputer.removeVerticalSeam(path)

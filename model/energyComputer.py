@@ -83,6 +83,13 @@ class EnergyComputer:
             res = intensity(self.image.get(x2,y2))
             self.intensityComputed[(x2,y2)] = res
             return res
-                
+    
+    def removeVerticalSeam(self, path):
+        for (x,y) in path:
+            for x2 in range(x,self.image.w-2):
+                self.energyComputed[(x,y)] = self.energy(x+1,y)
+            self.energyComputed[(x-1,y)] = self.energy(x-1,y)
+
+
 def intensity(pixelColors):
     return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
