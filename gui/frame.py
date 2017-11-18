@@ -34,7 +34,9 @@ class Frame:
         self.core.setImage("resources/pictures/ski.jpg")
         self.update()
 
+        self.test()
         self.frame.mainloop()
+
 
     def load(self):
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
@@ -53,7 +55,7 @@ class Frame:
     def test(self):
         #print(self.core.image.grid)
         #print(self.core.image.grid[0])
-        for i in range(0,2):
+        for i in range(0,5):
             pl = self.core.stupid_seam_finder()
 
             for p in pl["path"]:
