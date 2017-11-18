@@ -25,11 +25,14 @@ class Frame:
         self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
         self.refresh_button.pack()
                 
-        self.test_canvas = tkinter.Canvas(self.frame, width=1200, height=1200)
+        self.test_canvas = tkinter.Canvas(self.frame, width=1200, height=600)
         self.test_canvas.pack()
         
         self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
         self.current_file_label.pack()
+
+        self.core.setImage("resources/pictures/ski.jpg")
+        self.update()
 
         self.frame.mainloop()
 
@@ -50,12 +53,12 @@ class Frame:
     def test(self):
         #print(self.core.image.grid)
         #print(self.core.image.grid[0])
-        for i in range(0,5):
+        for i in range(0,2):
             pl = self.core.stupid_seam_finder()
 
             for p in pl["path"]:
                 self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
             
             self.core.removeVerticalSeam(pl["path"])
-            self.update
+        #self.update()
         

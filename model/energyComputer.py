@@ -2,6 +2,15 @@ import numpy
 import math
 import time
 
+def timer(f):
+    def f_timer(self, *args, **kwargs):
+        start = time.time()
+        res = f(self, *args, **kwargs)
+        end = time.time()
+        print("Computation time:", end - start)
+        return res
+    return f_timer
+
 class EnergyComputer:
     
     def __init__(self, image):
@@ -19,15 +28,6 @@ class EnergyComputer:
         y = max(1,y)
         y = max(self.image.h-3, y)
         return (x,y)
-    
-    def timer(f):
-        def f_timer(self, *args, **kwargs):
-            start = time.time()
-            res = f(self, *args, **kwargs)
-            end = time.time()
-            print("Computation time:", end-start)
-            return res
-        return f_timer
 
     @timer
     def stupid_seam_finder(self):
@@ -44,6 +44,15 @@ class EnergyComputer:
                 d = {e1: (x-1,y), e2: (x,y), e3: (x+1,y)}
                 e = min(e1,e2,e3)
                 seam_energy += e
+                """
+                conserver la seam_energy pour chaque pixel dans pe[]
+
+                if(pe["path"][j] == d[e]):
+                    for p in range(j, len(pe["path"])):
+                        path.append(p)
+                        seam_energy = ?
+                else:
+                """
                 path.append(d[e])
                 x = d[e][0]
                 x = self.fitToGrid(x,y)[0]
@@ -52,7 +61,7 @@ class EnergyComputer:
                 pe["path"] = path
         #print(pe)
         return pe
-    
+
     def energy(self, x, y):
         if(x == 0 or y == 0):
             return math.inf
@@ -61,13 +70,23 @@ class EnergyComputer:
             return res
         except KeyError:
             pass
+
+        #gx = self.g2(x, y, (-1,-1)) + self.g2(x, y, (-1,0)) * 2 + self.g2(x, y, (-1, 1))
+        #gx -= self.g2(x, y, (1,-1)) + self.g2(x, y, (1,0)) * 2 + self.g2(x, y, (1, 1))
+        
+        #gy = self.g2(x, y, (-1,-1)) + self.g2(x, y, (0,-1)) * 2 + self.g2(x, y, (1, -1))
+        #gy -= self.g2(x, y, (-1,1)) + self.g2(x, y, (0,1)) * 2 + self.g2(x, y, (1, 1))
+                
+
         gx = self.g(x, y, (-1,-1), (-1,0), (-1,1))
         gx -= self.g(x, y, (1,-1), (1,0), (1,1))
 
         gy = self.g(x, y, (-1,-1), (0,-1), (1,-1))
         gy -= self.g(x, y, (-1,1), (0,1), (1,1))
 
+
         res = math.sqrt(gx*gx + gy*gy)
+        #res = gx*gx + gy*gy
         self.energyComputed[(x,y)] = res
         return res
     
