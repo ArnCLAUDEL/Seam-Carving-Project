@@ -60,7 +60,7 @@ class Frame:
 
             for p in pl["path"]:
                 self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
-            
+
             self.core.removeVerticalSeam(pl["path"])
         #self.update()
         
