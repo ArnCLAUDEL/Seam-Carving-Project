@@ -37,11 +37,13 @@ class EnergyComputer:
             x, seam_energy, path = i-1, 0, []
             for j in range(1, h-1):
                 y = j
-                c, e = e_min(x,y)
+                e1, e2, e3 = self.energy(x - 1, y), self.energy(x, y), self.energy(x + 1, y)
+                e = min(e1, e2, e3)
+                c = (x + 1, y) if e == e3 else ((x, y) if e == e2 else (x - 1, y))
                 seam_energy += e
                 path.append(c)
                 x = c[0]
-                x = fit(x,y)[0]
+                x = 1 if x <= 0 else (self.image.w - 3 if x >= self.image.w - 3 else x)
             if pe["seam_energy"] > seam_energy:
                 pe = {"seam_energy":seam_energy,"path":path}
         print(end1-start1,"+",end2-start2)
