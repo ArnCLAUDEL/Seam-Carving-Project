@@ -1,5 +1,15 @@
 import tkinter
+import time
 from tkinter.filedialog import askopenfilename
+
+def timer(f):
+    def f_timer(self, *args, **kwargs):
+        start = time.time()
+        res = f(self, *args, **kwargs)
+        end = time.time()
+        print("Computation time:", end - start)
+        return res
+    return f_timer
 
 
 class Frame:
@@ -52,9 +62,8 @@ class Frame:
         self.current_image = self.core.getImage()
         self.test_canvas.create_image(0,0, image=self.current_image, anchor ="nw")
 
+    @timer
     def test(self):
-        #print(self.core.image.grid)
-        #print(self.core.image.grid[0])
         for i in range(0,5):
             pl = self.core.stupid_seam_finder()
 
@@ -62,5 +71,4 @@ class Frame:
                 self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
 
             self.core.removeVerticalSeam(pl["path"])
-        #self.update()
-        
+

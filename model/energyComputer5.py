@@ -17,6 +17,10 @@ class EnergyComputer:
         self.image = image
         self.energyComputed = {}
         self.intensityComputed = {}
+        self.count = 0
+        self.start, self.end = 0,0
+        self.__gx_coords = [(-1,-1), (-1,0), (-1,1), (1,-1), (1,0), (1,1)]
+        self.__gy_coords = [(-1,-1), (0,-1), (1,-1), (-1,1), (0,1), (1,1)]
 
     def inbound(self, x, y):
         return 0 <= x < self.image.w and 0 <= y < self.image.h
@@ -26,26 +30,29 @@ class EnergyComputer:
         y = 1 if y <= 0 else (self.image.h - 3 if y >= self.image.h - 3 else y)
         return x,y
 
+
     @timer
     def stupid_seam_finder(self):
         pe = {"seam_energy":math.inf, "path":[]}
         start1,end1,start2,end2 = float(0),float(0),float(0),float(0)
-        fit, e_min = self.fitToGrid, self.energy_min
-        self.count = 0
+        fit, e_min, energy = self.fitToGrid, self.energy_min, self.energy
         h = self.image.h
+        self.count = 0
         for i in range(1, self.image.w -2):
             x, seam_energy, path = i-1, 0, []
+            append = path.append
             for j in range(1, h-1):
                 y = j
-                e1, e2, e3 = self.energy(x - 1, y), self.energy(x, y), self.energy(x + 1, y)
+                e1, e2, e3 = energy(x - 1, y), energy(x, y), energy(x + 1, y)
                 e = min(e1, e2, e3)
                 c = (x + 1, y) if e == e3 else ((x, y) if e == e2 else (x - 1, y))
                 seam_energy += e
-                path.append(c)
+                append(c)
                 x = c[0]
                 x = 1 if x <= 0 else (self.image.w - 3 if x >= self.image.w - 3 else x)
             if pe["seam_energy"] > seam_energy:
                 pe = {"seam_energy":seam_energy,"path":path}
+        print(self.end - self.start)
         print(end1-start1,"+",end2-start2)
         print(len(self.energyComputed), self.count)
         return pe
@@ -56,40 +63,37 @@ class EnergyComputer:
     def energy_min(self, x, y):
         e1, e2, e3 = self.energy(x - 1, y), self.energy(x, y), self.energy(x + 1, y)
         e = min(e1, e2, e3)
-        # c = (x + 1, y) if e == e3 else ((x, y) if e == e2 else (x - 1, y))
-        if e == e3:
-            c = (x + 1, y)
-        elif e == e2:
-            c = (x, y)
-        else:
-            c = (x - 1, y)
+        c = (x + 1, y) if e == e3 else ((x, y) if e == e2 else (x - 1, y))
         return c,e
 
     def energy(self, x, y):
         if x == 0 or y == 0:
             return math.inf
         try:
-            res = self.energyComputed[(x,y)]
-            return res
+            return self.energyComputed[(x,y)]
         except KeyError:
             pass
 
         self.count += 1
 
-        gx = self.g(x, y, (-1,-1), (-1,0), (-1,1)) - self.g(x, y, (1,-1), (1,0), (1,1))
-        gy = self.g(x, y, (-1,-1), (0,-1), (1,-1)) - self.g(x, y, (-1,1), (0,1), (1,1))
+        gx, gy = self.g(x, y, *self.__gx_coords), self.g(x, y, *self.__gy_coords)
+
+        #gx = self.g(x, y, (-1,-1), (-1,0), (-1,1)) - self.g(x, y, (1,-1), (1,0), (1,1))
+        #gy = self.g(x, y, (-1,-1), (0,-1), (1,-1)) - self.g(x, y, (-1,1), (0,1), (1,1))
+
 
         res = math.sqrt(gx*gx + gy*gy)
         self.energyComputed[(x,y)] = res
         return res
-    
-    def g(self, x, y, c1, c2, c3):
-        return self.g2(x, y, c1) + self.g2(x, y, c2) * 2 + self.g2(x, y, c3)
+
+    def g(self, x, y, c1, c2, c3, c4, c5, c6):
+        return self.g2(x, y, c1) + self.g2(x, y, c2) * 2 + self.g2(x, y, c3) - self.g2(x, y, c4) - self.g2(x, y, c5) * 2 - self.g2(x, y, c6)
 
     def g2(self, x, y, c):
-        x2,y2 = x +c[0], y +c[1]
-        res = self.intensityComputed.get((x2,y2),-1)
-        if res < 0:
+        x2,y2 = x+c[0], y+c[1]
+        try:
+            res = self.intensityComputed[(x2, y2)]
+        except KeyError:
             res = intensity(self.image.get(x2, y2))
             self.intensityComputed[(x2, y2)] = res
         return res
