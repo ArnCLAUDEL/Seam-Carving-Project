@@ -30,13 +30,12 @@ class EnergyComputer:
         y = 1 if y <= 0 else (self.image.h - 3 if y >= self.image.h - 3 else y)
         return x,y
 
-
     @timer
     def stupid_seam_finder(self):
         pe = {"seam_energy":math.inf, "path":[]}
         start1,end1,start2,end2 = float(0),float(0),float(0),float(0)
         fit, e_min, energy = self.fitToGrid, self.energy_min, self.energy
-        h = self.image.h
+        w,h = self.image.w, self.image.h
         self.count = 0
         for i in range(1, self.image.w -2):
             x, seam_energy, path = i-1, 0, []
@@ -49,7 +48,7 @@ class EnergyComputer:
                 seam_energy += e
                 append(c)
                 x = c[0]
-                x = 1 if x <= 0 else (self.image.w - 3 if x >= self.image.w - 3 else x)
+                x = 1 if x <= 0 else (w - 3 if x >= w - 3 else x)
             if pe["seam_energy"] > seam_energy:
                 pe = {"seam_energy":seam_energy,"path":path}
         print(self.end - self.start)
@@ -74,13 +73,7 @@ class EnergyComputer:
         except KeyError:
             pass
 
-        self.count += 1
-
-        gx, gy = self.g(x, y, *self.__gx_coords), self.g(x, y, *self.__gy_coords)
-
-        #gx = self.g(x, y, (-1,-1), (-1,0), (-1,1)) - self.g(x, y, (1,-1), (1,0), (1,1))
-        #gy = self.g(x, y, (-1,-1), (0,-1), (1,-1)) - self.g(x, y, (-1,1), (0,1), (1,1))
-
+        gx, gy = self.g3(x, y, self.__gx_coords), self.g3(x, y, self.__gy_coords)
 
         res = math.sqrt(gx*gx + gy*gy)
         self.energyComputed[(x,y)] = res
@@ -91,6 +84,7 @@ class EnergyComputer:
 
     def g2(self, x, y, c):
         x2,y2 = x+c[0], y+c[1]
+
         try:
             res = self.intensityComputed[(x2, y2)]
         except KeyError:
@@ -98,11 +92,23 @@ class EnergyComputer:
             self.intensityComputed[(x2, y2)] = res
         return res
 
-    def removeVerticalSeam(self, path):
+    def g3(self, x, y, c_list):
+        v = []
+        for c in c_list:
+            x2, y2 = x + c[0], y + c[1]
+            try:
+                res = self.intensityComputed[(x2, y2)]
+            except KeyError:
+                res = intensity(self.image.get(x2, y2))
+                self.intensityComputed[(x2, y2)] = res
+            v.append(res)
+        return v[0] + v[1] * 2 + v[2] - v[3] - v[4] * 2 - v[5]
+
+    def removeVerticalSeam(self, path, iX=1, iY=0):
         energy = self.energy
         for (x,y) in path:
             for x2 in range(x,self.image.w-2):
-                self.energyComputed[(x,y)] = energy(x+1,y)
+                self.energyComputed[(x,y)] = energy(x+iX,y+iY)
 
 
 def intensity(pixelColors):
