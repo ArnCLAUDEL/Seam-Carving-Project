@@ -64,11 +64,17 @@ class Frame:
 
     @timer
     def test(self):
-        for i in range(0,5):
+        for i in range(0,3):
             pl = self.core.stupid_seam_finder()
 
             for p in pl["path"]:
                 self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
 
-            self.core.removeVerticalSeam(pl["path"])
+            #self.core.removeVerticalSeam(pl["path"])
+        for i in range(0,3):
+            pl = self.core.stupid_seam_finder(b=False)
+
+            for p in pl["path"]:
+                self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
+
 

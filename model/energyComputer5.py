@@ -31,32 +31,27 @@ class EnergyComputer:
         return x,y
 
     @timer
-    def stupid_seam_finder(self):
+    def stupid_seam_finder(self, b=True):
 
         #path_energy: minimal path
         pe = {"seam_energy":math.inf, "path":[]}
 
-        #timers
-        start1,end1,start2,end2 = float(0),float(0),float(0),float(0)
-
         #functions calls in local variables for better efficiency
-        fit, energy = self.fitToGrid, self.energy
+        energy = self.energy
 
         #width and height in local variables for better efficiency
         w,h = self.image.w, self.image.h
 
-        #number of energies computed
-        self.count = 0
+        if b:
+            pe = self.computeHorizontal(pe, energy, w, h)
+        else:
+            pe = self.computeVertical(pe, energy, w, h)
 
-        #variables used to work around a pixel, left/right or up/down
-        iX1,iY1, iX2,iY2, iX3,iY3 = -1,0, 0,0, 1,0
+        print(self.end - self.start)
+        print(len(self.energyComputed), self.count)
+        return pe
 
-        #index for (x,y) tuple
-        iC = 0
-
-        #function to keep a coordinate in bound
-        fit = lambda x:1 if x <= 0 else (self.image.w - 3 if x >= self.image.w - 3 else x)
-
+    def computeVertical(self, pe, energy, w, h):
         for i in range(0, w -2):
             x = i
             #current energy and path
@@ -65,20 +60,35 @@ class EnergyComputer:
 
             for j in range(1, h-1):
                 y = j
-                e1, e2, e3 = energy(x +iX1, y +iY1), energy(x +iX2,y +iY2), energy(x +iX3, y +iY3)
+                e1, e2, e3 = energy(x -1, y), energy(x,y), energy(x +1, y)
                 e = min(e1, e2, e3)
-                c = (x +iX3, y +iY3) if e == e3 else ((x +iX2,y +iY2) if e == e2 else (x +iX1, y +iY1))
+                x = x +1 if e == e3 else x if e == e2 else x -1
                 seam_energy += e
-                append(c)
-                x = c[iC]
-                x = fit(x)
+                append((x,y))
+                x = 1 if x <= 0 else (w - 3 if x >= w - 3 else x)
 
             if pe["seam_energy"] > seam_energy:
                 pe = {"seam_energy":seam_energy,"path":path}
+        return pe
 
-        print(self.end - self.start)
-        print(end1-start1,"+",end2-start2)
-        print(len(self.energyComputed), self.count)
+    def computeHorizontal(self, pe, energy, w, h):
+        for i in range(0, h -2):
+            y = i
+            #current energy and path
+            seam_energy, path = 0, []
+            append = path.append
+
+            for j in range(1, w-1):
+                x = j
+                e1, e2, e3 = energy(x, y-1), energy(x,y), energy(x, y+1)
+                e = min(e1, e2, e3)
+                y = y +1 if e == e3 else y if e == e2 else y -1
+                seam_energy += e
+                append((x,y))
+                y = 1 if y <= 0 else (self.image.h - 3 if y >= self.image.h - 3 else y)
+
+            if pe["seam_energy"] > seam_energy:
+                pe = {"seam_energy":seam_energy,"path":path}
         return pe
 
     def energy(self, x, y):

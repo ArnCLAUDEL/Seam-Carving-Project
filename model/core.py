@@ -36,8 +36,8 @@ class Core:
         return self.energyComputer.energy(x,y)
 
     @checkImage
-    def stupid_seam_finder(self):
-        return self.energyComputer.stupid_seam_finder()
+    def stupid_seam_finder(self, b=True):
+        return self.energyComputer.stupid_seam_finder(b)
 
     @checkImage
     def removeVerticalSeam(self, path):
