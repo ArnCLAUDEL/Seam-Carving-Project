@@ -1,7 +1,17 @@
+import time
 import cv2
 import numpy
 import PIL.Image as pimg
 import PIL.ImageTk as pimgtk
+
+def timer(f):
+    def f_timer(self, *args, **kwargs):
+        start = time.time()
+        res = f(self, *args, **kwargs)
+        end = time.time()
+        print(f, "done in", round((end - start), 2), "s")
+        return res
+    return f_timer
 
 class Image:
 
@@ -25,6 +35,7 @@ class Image:
         newImage = cv2.cvtColor(self.grid, cv2.COLOR_BGR2RGB)
         newImage = pimg.fromarray(newImage)
         return pimgtk.PhotoImage(newImage)
+
 
     def removeVerticalSeam(self, path):
         ndarrays = []

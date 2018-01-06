@@ -7,7 +7,7 @@ def timer(f):
         start = time.time()
         res = f(self, *args, **kwargs)
         end = time.time()
-        print("Computation time:", end - start)
+        print(f , "done in", round((end - start),2), "s")
         return res
     return f_timer
 
@@ -29,42 +29,61 @@ class EnergyComputer:
         self.energyComputed = [[math.inf for y in range(self.image.h)] for x in range(self.image.w)]
         self.verticalPathGrid = [[(0,0) for y in range(self.image.h)] for x in range(self.image.w)]
 
-
-        #Timer init value
-        self.start, self.end = 0,0
-
         #Coordinates used to compute gradient
         self.__gx_coords = [(-1,-1), (-1,0), (-1,1), (1,-1), (1,0), (1,1)]
         self.__gy_coords = [(-1,-1), (0,-1), (1,-1), (-1,1), (0,1), (1,1)]
 
-    @timer
-    def stupid_seam_finder(self, b=True):
         self.compute_energies()
 
-    def findVertical(self):
+    @timer
+    def stupid_seam_finder(self, b=True):
+        pe = self.findVerticalPath()
+        return pe
+        path = pe["path"]
+        print(len(path))
+
+        for p in path:
+            print(p)
+
+    def findVerticalPath(self):
+        self.compute_path()
+        pe = {"energy": math.inf, "path": []}
+
+        for x in range(1,self.image.w):
+            p = self.verticalPathGrid[x][1]
+            path = [(x,1)]
+            energy = 0
+            for y in range(1,self.image.h-2):
+                energy = energy + self.energyComputed[p[0]][p[1]]
+                path.append(p)
+                p = self.verticalPathGrid[p[0]][p[1]]
+            if energy < pe["energy"]:
+                pe["energy"] = energy
+                pe["path"] = path
+        return pe
+
+    @timer
+    def removeVerticalSeam(self, path, c=(1,0)):
+        energy = self.energy
+        iX,iY = c[0], c[1]
+        for (x,y) in path:
+            for i in range(x,self.image.w-2):
+                self.energyComputed[x][y] = energy(x+iX,y+iY)
+        #self.compute_path()
+
+    def compute_path(self):
         #Function calls and variables in local variables for better efficiency
         energyComputed = self.energyComputed
-
-        pathTab = []
-        for y in range(1,self.h-1):
-            line = []
-            for x in range(1,self.w-1):
-                e1, e2, e3 = energyComputed[x - 1][y + 1], energyComputed[x][y + 1], energyComputed[x + 1][y + 1]
-                e = min(e1, e2, e3)
-
-
-    def compute_energies(self):
-        #Function calls and variables in local variables for better efficiency
-        gradient,sqrt,inf = self.gradient,math.sqrt,math.inf
-        gx_coords,gy_coords = self.__gx_coords,self.__gy_coords
-        energyComputed = self.energyComputed
+        pathGrid = self.verticalPathGrid
 
         for y in range(1,self.image.h-1):
             for x in range(1,self.image.w-1):
-                res = inf
-                gx, gy = gradient(x, y, gx_coords), gradient(x, y, gy_coords)
-                res = sqrt(gx * gx + gy * gy)
-                energyComputed[x][y] = res
+                e1, e2, e3 = energyComputed[x - 1][y + 1], energyComputed[x][y + 1], energyComputed[x + 1][y + 1]
+                e = min(e1, e2, e3)
+                (x2, y2) = (x + 1, y + 1) if e == e3 else (x, y + 1) if e == e2 else (x - 1, y + 1)
+                pathGrid[x][y] = (x2,y2)
+
+
 
     def intensity(self, pixelColors):
         return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])

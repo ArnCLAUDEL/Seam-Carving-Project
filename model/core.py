@@ -1,5 +1,5 @@
 import model.image as img
-import model.energyComputer6 as ec
+import model.energyComputer7 as ec
 
 class Core:
 

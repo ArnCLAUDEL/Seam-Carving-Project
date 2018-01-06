@@ -7,7 +7,7 @@ def timer(f):
         start = time.time()
         res = f(self, *args, **kwargs)
         end = time.time()
-        print("Computation time:", end - start)
+        print(f, "done in", round((end - start), 2), "s")
         return res
     return f_timer
 
@@ -15,12 +15,17 @@ class EnergyComputer:
 
     def __init__(self, image):
         self.image = image
-        self.energyComputed = {}
-        self.intensityComputed = {}
+
+        self.intensityComputed = [[-1 for y in range(self.image.h)] for x in range(self.image.w)]
+        self.energyComputed = [[1000 for y in range(self.image.h)] for x in range(self.image.w)]
+
         self.count = 0
         self.start, self.end = 0,0
+
         self.__gx_coords = [(-1,-1), (-1,0), (-1,1), (1,-1), (1,0), (1,1)]
         self.__gy_coords = [(-1,-1), (0,-1), (1,-1), (-1,1), (0,1), (1,1)]
+
+        self.compute_energies()
 
     def inbound(self, x, y):
         return 0 <= x < self.image.w and 0 <= y < self.image.h
@@ -30,7 +35,7 @@ class EnergyComputer:
         y = 1 if y <= 0 else (self.image.h - 3 if y >= self.image.h - 3 else y)
         return x,y
 
-    @timer
+
     def stupid_seam_finder(self, b=True):
 
         #path_energy: minimal path
@@ -46,21 +51,19 @@ class EnergyComputer:
             pe = self.computeHorizontal(pe, energy, w, h)
         else:
             pe = self.computeVertical(pe, energy, w, h)
-
-        print(self.end - self.start)
-        print(len(self.energyComputed), self.count)
         return pe
 
+
     def computeVertical(self, pe, energy, w, h):
+        energyComputed = self.energyComputed
         for i in range(0, w -2):
             x = i
             #current energy and path
             seam_energy, path = 0, []
             append = path.append
-
             for j in range(1, h-1):
                 y = j
-                e1, e2, e3 = energy(x -1, y), energy(x,y), energy(x +1, y)
+                e1, e2, e3 = energyComputed[x - 1][y + 1], energyComputed[x][y + 1], energyComputed[x + 1][y + 1]
                 e = min(e1, e2, e3)
                 x = x +1 if e == e3 else x if e == e2 else x -1
                 seam_energy += e
@@ -71,6 +74,7 @@ class EnergyComputer:
                 pe = {"seam_energy":seam_energy,"path":path}
         return pe
 
+    #not checked
     def computeHorizontal(self, pe, energy, w, h):
         for i in range(0, h -2):
             y = i
@@ -91,51 +95,49 @@ class EnergyComputer:
                 pe = {"seam_energy":seam_energy,"path":path}
         return pe
 
-    def energy(self, x, y):
-        if x == 0 or y == 0:
-            return math.inf
-        try:
-            return self.energyComputed[(x,y)]
-        except KeyError:
-            pass
+    def intensity(self, pixelColors):
+        return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
 
-        gx, gy = self.g3(x, y, self.__gx_coords), self.g3(x, y, self.__gy_coords)
-        res = math.sqrt(gx*gx + gy*gy)
-        self.energyComputed[(x,y)] = res
-        return res
-
-    def g(self, x, y, c1, c2, c3, c4, c5, c6):
-        return self.g2(x, y, c1) + self.g2(x, y, c2) * 2 + self.g2(x, y, c3) - self.g2(x, y, c4) - self.g2(x, y, c5) * 2 - self.g2(x, y, c6)
-
-    def g2(self, x, y, c):
-        x2,y2 = x+c[0], y+c[1]
-
-        try:
-            res = self.intensityComputed[(x2, y2)]
-        except KeyError:
-            res = intensity(self.image.get(x2, y2))
-            self.intensityComputed[(x2, y2)] = res
-        return res
-
-    def g3(self, x, y, c_list):
+    def gradient(self, x, y, c_list):
         v = []
         for c in c_list:
             x2, y2 = x + c[0], y + c[1]
-            try:
-                res = self.intensityComputed[(x2, y2)]
-            except KeyError:
-                res = intensity(self.image.get(x2, y2))
-                self.intensityComputed[(x2, y2)] = res
+            res = self.intensityComputed[x2][y2]
+            if res < 0:
+                res = self.intensity(self.image.get(x2, y2))
+                self.intensityComputed[x2][y2] = res
             v.append(res)
+
         return v[0] + v[1] * 2 + v[2] - v[3] - v[4] * 2 - v[5]
+
+    def energy(self, x, y):
+        res = math.inf
+        gx, gy = self.gradient(x, y, self.__gx_coords), self.gradient(x, y, self.__gy_coords)
+        res = math.sqrt(gx * gx + gy * gy)
+        return res
+
+
+    def compute_energies(self):
+        #Function calls and variables in local variables for better efficiency
+        gradient,sqrt,inf = self.gradient,math.sqrt,math.inf
+        gx_coords,gy_coords = self.__gx_coords,self.__gy_coords
+        energyComputed = self.energyComputed
+
+        for y in range(1,self.image.h-1):
+            for x in range(1,self.image.w-1):
+                energyComputed[x][y] = self.energy(x,y)
+
 
     def removeVerticalSeam(self, path, c=(1,0)):
         energy = self.energy
         iX,iY = c[0], c[1]
         for (x,y) in path:
-            for x2 in range(x,self.image.w-2):
-                self.energyComputed[(x,y)] = energy(x+iX,y+iY)
+            for x2 in range(x-2):
+                self.energyComputed[x][y] = self.energyComputed[x+1][y]
 
+
+
+    # not checked
     def removeHorizontalSeam(self, path, c=(0,1)):
         energy = self.energy
         iX,iY = c[0], c[1]
@@ -144,5 +146,4 @@ class EnergyComputer:
                 self.energyComputed[(x,y)] = energy(x+iX,y+iY)
 
 
-def intensity(pixelColors):
-    return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
+
