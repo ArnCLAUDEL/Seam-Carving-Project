@@ -16,8 +16,7 @@ class Image:
     def updateCoordinates(self):
         self.w = len(self.grid[0])
         self.h = len(self.grid)
-        print("Coordinates:", self.w, ":", self.h)
-
+        print("Shape:", self.grid.shape, "Coordinates:", self.w, ":", self.h)
 
     def get(self, x, y):
         return self.grid[y][x]
@@ -34,4 +33,37 @@ class Image:
             ndarrays.append(numpy.delete(self.grid[p[1]], p[0], 0))
         ndarrays.append(numpy.delete(self.grid[path[len(path)-1][1]], path[len(path)-1][0], 0))
         self.grid = numpy.array(ndarrays)
+        self.updateCoordinates()
+
+    def removeHorizontalSeam(self, path):
+        gridTemp = list()
+        for i in range(0, self.w):
+            gridTemp.append([])
+            for j in range(0, self.h-1):
+                gridTemp[i].append(self.grid[j,i])
+
+        gridTemp = numpy.array(gridTemp)
+        ndarrays = list()
+
+        ndarrays.append(numpy.delete(gridTemp[path[0][0]], path[0][1], 0))
+
+        for p in path:
+            try:
+                ndarrays.append(numpy.delete(gridTemp[p[0]], p[1], 0))
+            except IndexError:
+                print(gridTemp.shape, p[1],p[0])
+        ndarrays.append(numpy.delete(gridTemp[path[len(path) -1][0]], path[len(path) - 1][1], 0))
+        ndarrays = numpy.array(ndarrays)
+
+        #print(ndarrays.shape)
+
+        gridTemp = list()
+        for i in range(0, self.h-1):
+            gridTemp.append([])
+            for j in range(0, self.w):
+                gridTemp[i].append(self.grid[i,j])
+
+
+        self.grid = numpy.array(gridTemp)
+
         self.updateCoordinates()

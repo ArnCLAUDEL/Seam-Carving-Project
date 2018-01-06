@@ -1,5 +1,6 @@
 import tkinter
 import time
+import numpy
 from tkinter.filedialog import askopenfilename
 
 def timer(f):
@@ -47,7 +48,6 @@ class Frame:
         self.test()
         self.frame.mainloop()
 
-
     def load(self):
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
 
@@ -60,21 +60,25 @@ class Frame:
     def update(self):
         self.label.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
         self.current_image = self.core.getImage()
-        self.test_canvas.create_image(0,0, image=self.current_image, anchor ="nw")
+
+        self.test_canvas.create_image(0, 0, image=self.current_image, anchor="nw")
+
+
 
     @timer
     def test(self):
-        for i in range(0,3):
+        self.test_canvas.delete("all")
+        for i in range(0,5):
             pl = self.core.stupid_seam_finder()
 
             for p in pl["path"]:
                 self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
 
-            #self.core.removeVerticalSeam(pl["path"])
-        for i in range(0,3):
+            self.core.removeHorizontalSeam(pl["path"])
+        #self.core.removeVerticalSeam(pl["path"])
+        for i in range(0,0):
             pl = self.core.stupid_seam_finder(b=False)
 
             for p in pl["path"]:
-                self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
-
-
+                self.test_canvas.create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
+            self.core.removeVerticalSeam(pl["path"])

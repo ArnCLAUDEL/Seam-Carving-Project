@@ -1,5 +1,5 @@
 import model.image as img
-import model.energyComputer5 as ec
+import model.energyComputer6 as ec
 
 class Core:
 
@@ -43,3 +43,8 @@ class Core:
     def removeVerticalSeam(self, path):
         self.image.removeVerticalSeam(path)
         self.energyComputer.removeVerticalSeam(path)
+
+    @checkImage
+    def removeHorizontalSeam(self, path):
+        self.image.removeHorizontalSeam(path)
+        self.energyComputer.removeHorizontalSeam(path)

@@ -44,25 +44,7 @@ class EnergyComputer:
 
         if b:
             pe = self.computeHorizontal(pe, energy, w, h)
-        else:
-            pe = self.computeVertical(pe, energy, w, h)
-
-        print(self.end - self.start)
-        print(len(self.energyComputed), self.count)
-        return pe
-
-    def computeVertical(self, pe, energy, w, h):
-        for i in range(0, w -2):
-            x = i
-            #current energy and path
-            seam_energy, path = 0, []
-            append = path.append
-
-            for j in range(1, h-1):
-                y = j
-                e1, e2, e3 = energy(x -1, y), energy(x,y), energy(x +1, y)
-                e = min(e1, e2, e3)
-                x = x +1 if e == e3 else x if e == e2 else x -1
+        else
                 seam_energy += e
                 append((x,y))
                 x = 1 if x <= 0 else (w - 3 if x >= w - 3 else x)
@@ -134,6 +116,13 @@ class EnergyComputer:
         iX,iY = c[0], c[1]
         for (x,y) in path:
             for x2 in range(x,self.image.w-2):
+                self.energyComputed[(x,y)] = energy(x+iX,y+iY)
+
+    def removeHorizontalSeam(self, path, c=(0,1)):
+        energy = self.energy
+        iX,iY = c[0], c[1]
+        for (x,y) in path:
+            for x2 in range(x,self.image.h-2):
                 self.energyComputed[(x,y)] = energy(x+iX,y+iY)
 
 
