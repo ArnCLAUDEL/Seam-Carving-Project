@@ -1,5 +1,6 @@
 import numpy
 import math
+import asyncio
 
 def timer(f):
     def f_timer(self, *args, **kwargs):
@@ -28,70 +29,14 @@ class EnergyCalculator:
         # Tab with the intensity of each pixel. Initial value : an arbitrary high energy value
         self.energyComputed = [[self.HIGHT_ENERGY_VALUE for y in range(self.image.h)] for x in range(self.image.w)]
 
+        loop = asyncio.get_event_loop()
+        #loop.run_in_executor(None, self.pre_process)
+        self.pre_process()
+
+    def pre_process(self):
+        print("Starting pre-processing")
         self.compute_energies()
-
-    def stupid_seam_finder(self, b=True):
-
-        # path_energy: minimal path
-        pe = {"seam_energy":math.inf, "path":[]}
-
-        # functions calls in local variables for better efficiency
-        energy = self.energy
-
-        # width and height in local variables for better efficiency
-        w,h = self.image.w, self.image.h
-
-        if b:
-            pe = self.computeHorizontal(pe, energy, w, h)
-        else:
-            pe = self.computeVertical(pe, energy, w, h)
-        return pe
-
-    # Find a vertical seam in the image
-    # pe : [path,energy]
-    # energy : energy function
-    # w : width of the image
-    # h : height of the image
-    def computeVertical(self, pe, energy, w, h):
-        energyComputed = self.energyComputed
-        for i in range(0, w -2):
-            x = i
-            #current energy and path
-            seam_energy, path = 0, []
-            append = path.append
-            for j in range(1, h-1):
-                y = j
-                e1, e2, e3 = energyComputed[x - 1][y + 1], energyComputed[x][y + 1], energyComputed[x + 1][y + 1]
-                e = min(e1, e2, e3)
-                x = x +1 if e == e3 else x if e == e2 else x -1
-                seam_energy += e
-                append((x,y))
-                x = 1 if x <= 0 else (w - 3 if x >= w - 3 else x)
-
-            if pe["seam_energy"] > seam_energy:
-                pe = {"seam_energy":seam_energy,"path":path}
-        return pe
-
-    # TODO
-    def computeHorizontal(self, pe, energy, w, h):
-        for i in range(0, h -2):
-            y = i
-            #current energy and path
-            seam_energy, path = 0, []
-            append = path.append
-
-            for j in range(1, w-1):
-                x = j
-                e1, e2, e3 = energy(x, y-1), energy(x,y), energy(x, y+1)
-                e = min(e1, e2, e3)
-                y = y +1 if e == e3 else y if e == e2 else y -1
-                seam_energy += e
-                append((x,y))
-                y = 1 if y <= 0 else (self.image.h - 3 if y >= self.image.h - 3 else y)
-
-            if pe["seam_energy"] > seam_energy:
-                pe = {"seam_energy":seam_energy,"path":path}
-        return pe
+        print("Computation done")
 
     # Compute the intensity given RGB values of a pixel
     def intensity(self, pixelColors):
@@ -113,7 +58,6 @@ class EnergyCalculator:
 
     # Compute the energy of a pixel at (x,y)
     def energy(self, x, y):
-        res = math.inf
         gx, gy = self.gradient(x, y, self.GX_COORDS), self.gradient(x, y, self.GY_COORDS)
         res = math.sqrt(gx * gx + gy * gy)
         return res
@@ -127,7 +71,9 @@ class EnergyCalculator:
             for x in range(1,self.image.w-1):
                 energyComputed[x][y] = self.energy(x,y)
 
+
     # Remove a vertical seam in the image.
+    # c : coordinates (a,b) used to easely adapt the direction
     def removeVerticalSeam(self, path, c=(1,0)):
         iX,iY = c[0], c[1]
         for (x,y) in path:
