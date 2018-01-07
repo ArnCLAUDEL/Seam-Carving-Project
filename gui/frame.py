@@ -45,7 +45,6 @@ class Frame:
         self.core.setImage("resources/pictures/ski.jpg")
         self.update()
 
-        self.test()
         self.frame.mainloop()
 
     def load(self):
