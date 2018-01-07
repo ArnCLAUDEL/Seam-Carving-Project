@@ -38,9 +38,9 @@ class EnergyCalculator:
         self.compute_energies()
         print("Computation done")
 
-    # Compute the intensity given RGB values of a pixel
+    # Compute the intensity given BGR values of a pixel
     def intensity(self, pixelColors):
-        return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
+        return int(pixelColors[0]) + 2 * int(pixelColors[1]) + int(pixelColors[2])
 
     # Compute the gradient of the pixel at (x,y)
     # c_lost : list of 6 coordinates (a,b) to get the pixel on top, right, left etc.
@@ -59,7 +59,7 @@ class EnergyCalculator:
     # Compute the energy of a pixel at (x,y)
     def energy(self, x, y):
         gx, gy = self.gradient(x, y, self.GX_COORDS), self.gradient(x, y, self.GY_COORDS)
-        res = math.sqrt(gx * gx + gy * gy)
+        res = math.sqrt(gx ** 2 + gy ** 2)
         return res
 
     # Compute the energy of each pixel in the image

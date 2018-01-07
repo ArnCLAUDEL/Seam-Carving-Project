@@ -1,6 +1,7 @@
 import tkinter
 import time
 import numpy
+import model.image as img
 from tkinter.filedialog import askopenfilename
 
 def timer(f):
@@ -30,19 +31,33 @@ class Frame:
         self.label = tkinter.StringVar()
         self.label.set("NONE")
 
-        self.test_button = tkinter.Button(self.frame, text="Find Seam", command=self.test)
-        self.test_button.pack()
+        self.preprocessing_label = tkinter.StringVar()
+        self.preprocessing_label.set("Load an image to start.")
+
+
+        self.resize_buttons = tkinter.Frame(self.frame)
+
+        self.reduce_width = tkinter.Button(self.resize_buttons, text="-", command=lambda: self.resize_image(-1))
+        self.reduce_width.pack(side="left")
+
+        self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image(1))
+        self.increase_width.pack(side="left")
+
+        self.resize_buttons.pack()
 
         self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
         self.refresh_button.pack()
                 
-        self.test_canvas = tkinter.Canvas(self.frame, width=1200, height=1200, highlightthickness=0)
+        self.test_canvas = tkinter.Canvas(self.frame, width=100, height=100, highlightthickness=0)
         self.test_canvas.pack(expand=1)
-        
+
+        self.preprocessing_icon = tkinter.Label(self.frame, textvariable=self.preprocessing_label)
+        self.preprocessing_icon.pack()
+
         self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
         self.current_file_label.pack()
 
-        self.core.setImage("resources/pictures/ski.jpg")
+        #self.core.setImage("resources/pictures/ski.jpg")
 
         self.test_canvas.bind("<Configure>", self.on_resize)
         self.frame.mainloop()
@@ -52,10 +67,14 @@ class Frame:
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
 
         if file:
-            print("Picture selected")
+            self.preprocessing_label.set("We are pre-processing your image")
+            self.frame.update()
             self.core.setImage(file)
-            print("Picture loaded")
+            self.preprocessing_label.set("")
             self.update()
+        else:
+            self.preprocessing_label.set("Load an image to start.")
+
 
     def update(self):
         self.label.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
@@ -72,6 +91,11 @@ class Frame:
             self.update()
             for p in pl["path"]:
                 self.test_canvas.create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
+
+    def resize_image(self, amount = 0):
+        self.test_canvas.configure(width=self.test_canvas.winfo_width() + amount)
+
+
 
     @timer
     def test(self):
