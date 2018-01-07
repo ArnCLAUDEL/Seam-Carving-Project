@@ -1,6 +1,6 @@
-import numpy
 import math
 import asyncio
+import numpy
 
 def timer(f):
     def f_timer(self, *args, **kwargs):
@@ -29,17 +29,19 @@ class EnergyCalculator:
         # Tab with the intensity of each pixel. Initial value : an arbitrary high energy value
         self.energyComputed = [[self.HIGHT_ENERGY_VALUE for y in range(self.image.h)] for x in range(self.image.w)]
 
-        loop = asyncio.get_event_loop()
-        #loop.run_in_executor(None, self.pre_process)
+        # loop = asyncio.get_event_loop()
+        # loop.run_in_executor(None, self.pre_process)
         self.pre_process()
 
+    # Pre-process the image
+    # Compute the enrgy for each pixel
+    # Time consuming operation
     def pre_process(self):
-        print("Starting pre-processing")
         self.compute_energies()
-        print("Computation done")
 
     # Compute the intensity given BGR values of a pixel
-    def intensity(self, pixelColors):
+    @staticmethod
+    def intensity(pixelColors):
         return int(pixelColors[0]) + 2 * int(pixelColors[1]) + int(pixelColors[2])
 
     # Compute the gradient of the pixel at (x,y)
@@ -64,29 +66,17 @@ class EnergyCalculator:
 
     # Compute the energy of each pixel in the image
     def compute_energies(self):
-        #Function calls and variables in local variables for better efficiency
-        energyComputed = self.energyComputed
+        # Function calls and variables in local variables for better efficiency
+        energy_computed = self.energyComputed
 
         for y in range(1,self.image.h-1):
             for x in range(1,self.image.w-1):
-                energyComputed[x][y] = self.energy(x,y)
-
+                energy_computed[x][y] = self.energy(x,y)
 
     # Remove a vertical seam in the image.
     # c : coordinates (a,b) used to easely adapt the direction
-    def removeVerticalSeam(self, path, c=(1,0)):
-        iX,iY = c[0], c[1]
+    def remove_vertical_seam(self, path, c=(1,0)):
+        ix,iy = c[0], c[1]
         for (x,y) in path:
             for x2 in range(x-2):
-                self.energyComputed[x][y] = self.energyComputed[x+iX][y+iY]
-
-    # TODO
-    def removeHorizontalSeam(self, path, c=(0,1)):
-        energy = self.energy
-        iX,iY = c[0], c[1]
-        for (x,y) in path:
-            for x2 in range(x,self.image.h-2):
-                self.energyComputed[(x,y)] = energy(x+iX,y+iY)
-
-
-
+                self.energyComputed[x][y] = self.energyComputed[x+ix][y+iy]

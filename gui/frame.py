@@ -1,115 +1,109 @@
-import tkinter
-import time
-import numpy
 import model.image as img
+import numpy
+import tkinter
 from tkinter.filedialog import askopenfilename
-
-def timer(f):
-    def f_timer(self, *args, **kwargs):
-        start = time.time()
-        res = f(self, *args, **kwargs)
-        end = time.time()
-        print(f, "done in", round((end - start), 2), "s")
-        return res
-    return f_timer
-
 
 class Frame:
 
     def __init__(self,  core):
         self.frame = tkinter.Tk()
         self.core = core
+        self.current_image = None
         self.__initialize()
-        
 
     def __initialize(self):
         self.frame.title("Seam Carver")
-        
+
+        # # StringVars
+
+        # StringVar with image information
+        self.image_information = tkinter.StringVar()
+        self.image_information.set("NONE")
+
+        # StringVar with a message for the user
+        self.user_message= tkinter.StringVar()
+        self.user_message.set("Load an image to start.")
+
+        # # Buttons
+
+        # Button used to load a new image
         self.load_button = tkinter.Button(self.frame, text="Load", command=self.load)
         self.load_button.pack()
 
-        self.label = tkinter.StringVar()
-        self.label.set("NONE")
-
-        self.preprocessing_label = tkinter.StringVar()
-        self.preprocessing_label.set("Load an image to start.")
-
-
+        # Frame that will contain buttons for resizing
         self.resize_buttons = tkinter.Frame(self.frame)
-
-        self.reduce_width = tkinter.Button(self.resize_buttons, text="-", command=lambda: self.resize_image(-1))
-        self.reduce_width.pack(side="left")
-
-        self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image(1))
-        self.increase_width.pack(side="left")
-
         self.resize_buttons.pack()
 
+        # Button used to reduce the width by 1px
+        self.reduce_width = tkinter.Button(self.resize_buttons, text="-", command=lambda: self.resize_image_width(-1))
+        self.reduce_width.pack(side="left")
+
+        # Button used to increase the width by 1px
+        self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image_width(1))
+        self.increase_width.pack(side="left");
+
+        # Button used to refresh the image
         self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
         self.refresh_button.pack()
-                
-        self.test_canvas = tkinter.Canvas(self.frame, width=100, height=100, highlightthickness=0)
-        self.test_canvas.pack(expand=1)
 
-        self.preprocessing_icon = tkinter.Label(self.frame, textvariable=self.preprocessing_label)
-        self.preprocessing_icon.pack()
+        # # Canvas
 
-        self.current_file_label = tkinter.Label(self.frame, textvariable=self.label)
-        self.current_file_label.pack()
+        # Canvas that will contain the image
+        self.canvas = tkinter.Canvas(self.frame, width=100, height=100, highlightthickness=0)
+        self.canvas .pack(expand=1)
 
-        #self.core.setImage("resources/pictures/ski.jpg")
+        # Callback when the size of the windows changes
+        self.canvas.bind("<Configure>", self.on_resize)
 
-        self.test_canvas.bind("<Configure>", self.on_resize)
+        # # Labels
+
+        # Label that displays a message to the user
+        self.user_message_label = tkinter.Label(self.frame, textvariable=self.user_message)
+        self.user_message_label.pack()
+
+        # Label that displays image information
+        self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
+        self.image_information_label.pack()
+
         self.frame.mainloop()
 
-
+    # Displays a window to select a jpg image
     def load(self):
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
 
         if file:
-            self.preprocessing_label.set("We are pre-processing your image")
+            self.user_message.set("We are pre-processing your image")
             self.frame.update()
-            self.core.setImage(file)
-            self.preprocessing_label.set("")
+            self.core.set_image(file)
+            self.user_message.set("")
             self.update()
         else:
-            self.preprocessing_label.set("Load an image to start.")
+            self.user_message.set("Load an image to start.")
 
-
+    # Update the frame, the image and its information
     def update(self):
-        self.label.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
-        self.current_image = self.core.getImage()
-        self.frame.minsize(self.core.w()-1,self.core.h()+200-1)
-        self.test_canvas.configure(width=self.core.w(), height=self.core.h())
-        self.test_canvas.create_image(0, 0, image=self.current_image, anchor="nw")
+        # Image path + size
+        self.image_information.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
+        self.current_image = self.core.get_image()
 
-    @timer
+        # The minimum size is restricted by the size of the image
+        self.frame.minsize(self.core.w()-1,self.core.h()+200-1)
+
+        # We adjust the size of the canvas to the image
+        self.canvas.configure(width=self.core.w(), height=self.core.h())
+
+        # This draws the image on the canvas
+        self.canvas.create_image(0, 0, image=self.current_image, anchor="nw")
+
+    # Callback that allows the user to resize the image by resizing the windows
     def on_resize(self, event):
-        if self.core.w() != False and self.test_canvas.winfo_width() < self.core.w():
+        if self.core.w() != False and self.canvas.winfo_width() < self.core.w():
             pl = self.core.stupid_seam_finder(b=False)
-            self.core.removeVerticalSeam(pl["path"])
+            self.core.remove_vertical_seam(pl["path"])
             self.update()
             for p in pl["path"]:
-                self.test_canvas.create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
+                self.canvas .create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
 
-    def resize_image(self, amount = 0):
-        self.test_canvas.configure(width=self.test_canvas.winfo_width() + amount)
-
-
-
-    @timer
-    def test(self):
-        for i in range(0,0):
-            pl = self.core.stupid_seam_finder()
-
-            for p in pl["path"]:
-                self.test_canvas.create_oval(p[0]-0.5,p[1]-0.5,p[0]+0.5,p[1]+0.5)
-
-            self.core.removeHorizontalSeam(pl["path"])
-
-        for i in range(0,1):
-            pl = self.core.stupid_seam_finder(b=False)
-
-            for p in pl["path"]:
-                self.test_canvas.create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
-            self.core.removeVerticalSeam(pl["path"])
+    # Resize the image with the given amount
+    def resize_image_width(self, amount):
+        self.canvas.configure(width=self.canvas.winfo_width() + amount)
