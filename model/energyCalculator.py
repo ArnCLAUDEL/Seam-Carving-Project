@@ -78,5 +78,6 @@ class EnergyCalculator:
     def remove_vertical_seam(self, path, c=(1,0)):
         ix,iy = c[0], c[1]
         for (x,y) in path:
-            for i in range(1,x-2):
-                self.energyComputed[x][y] = self.energyComputed[x+ix][y+iy]
+            for i in range(x,self.image.w):
+                self.energyComputed[i][y] = self.energyComputed[i+ix][y+iy]
+        self.energyComputed.pop()

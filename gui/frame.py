@@ -69,10 +69,7 @@ class Frame:
 
         # Label that displays image information
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
-        self.image_information_label.pack()
-
-        self.core.set_image("resources/pictures/ski.jpg")
-        self.user_message.set("")
+        #self.image_information_label.pack()
 
         self.frame.mainloop()
 

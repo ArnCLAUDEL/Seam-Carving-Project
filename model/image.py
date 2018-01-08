@@ -48,6 +48,7 @@ class Image:
         self.grid = numpy.array(ndarrays)
         self.update_size()
 
+    #TODO
     def remove_horizontal_seam(self, path):
         gridTemp = list()
         for i in range(0, self.w):
