@@ -1,6 +1,8 @@
 import model.image as img
 import numpy
 import tkinter
+
+from model.seamCarvingUtil import *
 from tkinter.filedialog import askopenfilename
 
 class Frame:
@@ -38,6 +40,10 @@ class Frame:
         self.reduce_width = tkinter.Button(self.resize_buttons, text="-", command=lambda: self.resize_image_width(-1))
         self.reduce_width.pack(side="left")
 
+        # Button used to reduce automatically the image by 100px
+        self.auto_find = tkinter.Button(self.resize_buttons, text="auto", command=lambda: self.auto_finder(100))
+        self.auto_find.pack(side="left")
+
         # Button used to increase the width by 1px
         self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image_width(1))
         self.increase_width.pack(side="left");
@@ -64,6 +70,9 @@ class Frame:
         # Label that displays image information
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
         self.image_information_label.pack()
+
+        self.core.set_image("resources/pictures/ski.jpg")
+        self.user_message.set("")
 
         self.frame.mainloop()
 
@@ -96,6 +105,7 @@ class Frame:
         self.canvas.create_image(0, 0, image=self.current_image, anchor="nw")
 
     # Callback that allows the user to resize the image by resizing the windows
+    @timer
     def on_resize(self, event):
         if self.core.w() != False and self.canvas.winfo_width() < self.core.w():
             pl = self.core.stupid_seam_finder(b=False)
@@ -104,6 +114,11 @@ class Frame:
             for p in pl["path"]:
                 self.canvas .create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
 
-    # Resize the image with the given amount
-    def resize_image_width(self, amount):
-        self.canvas.configure(width=self.canvas.winfo_width() + amount)
+    def auto_finder(self, value):
+        for i in range(value):
+            self.resize_image_width(-1)
+            self.frame.update()
+
+    # Resize the image with the given value
+    def resize_image_width(self, value):
+        self.canvas.configure(width=self.canvas.winfo_width() + value)
