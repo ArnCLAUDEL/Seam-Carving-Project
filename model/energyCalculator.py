@@ -1,6 +1,8 @@
 import math
 import asyncio
 import numpy
+from model.seamCarvingUtil import *
+
 
 def timer(f):
     def f_timer(self, *args, **kwargs):
@@ -42,7 +44,7 @@ class EnergyCalculator:
     # Compute the intensity given BGR values of a pixel
     @staticmethod
     def intensity(pixelColors):
-        return int(pixelColors[0]) + 2 * int(pixelColors[1]) + int(pixelColors[2])
+        return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
 
     # Compute the gradient of the pixel at (x,y)
     # c_lost : list of 6 coordinates (a,b) to get the pixel on top, right, left etc.
@@ -65,19 +67,24 @@ class EnergyCalculator:
         return res
 
     # Compute the energy of each pixel in the image
+    @timer
     def compute_energies(self):
         # Function calls and variables in local variables for better efficiency
         energy_computed = self.energyComputed
+        energy = self.energy
 
         for y in range(1,self.image.h-1):
             for x in range(1,self.image.w-1):
-                energy_computed[x][y] = self.energy(x,y)
+                energy_computed[x][y] = int(energy(x,y))
 
     # Remove a vertical seam in the image.
     # c : coordinates (a,b) used to easily adapt the direction
     def remove_vertical_seam(self, path, c=(1,0)):
+        # Function calls and variables in local variables for better efficiency
+        energy_computed = self.energyComputed
+
         ix,iy = c[0], c[1]
         for (x,y) in path:
             for i in range(x,self.image.w):
-                self.energyComputed[i][y] = self.energyComputed[i+ix][y+iy]
-        self.energyComputed.pop()
+                energy_computed[i][y] = energy_computed[i+ix][y+iy]
+        energy_computed.pop()
