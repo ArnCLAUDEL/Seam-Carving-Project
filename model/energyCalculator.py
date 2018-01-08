@@ -74,9 +74,9 @@ class EnergyCalculator:
                 energy_computed[x][y] = self.energy(x,y)
 
     # Remove a vertical seam in the image.
-    # c : coordinates (a,b) used to easely adapt the direction
+    # c : coordinates (a,b) used to easily adapt the direction
     def remove_vertical_seam(self, path, c=(1,0)):
         ix,iy = c[0], c[1]
         for (x,y) in path:
-            for x2 in range(x-2):
+            for i in range(1,x-2):
                 self.energyComputed[x][y] = self.energyComputed[x+ix][y+iy]
