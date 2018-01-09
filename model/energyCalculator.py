@@ -1,17 +1,7 @@
 import math
 import asyncio
 import numpy
-from model.seamCarvingUtil import *
-
-
-def timer(f):
-    def f_timer(self, *args, **kwargs):
-        start = time.time()
-        res = f(self, *args, **kwargs)
-        end = time.time()
-        print(f, "done in", round((end - start), 2), "s")
-        return res
-    return f_timer
+from model.seamCarvingUtil import timer
 
 class EnergyCalculator:
 
@@ -35,18 +25,18 @@ class EnergyCalculator:
         # loop.run_in_executor(None, self.pre_process)
         self.pre_process()
 
-    # Pre-process the image
-    # Compute the enrgy for each pixel
+    # Pre-process the image.
+    # Compute the enregy for each pixel.
     # Time consuming operation
     def pre_process(self):
         self.compute_energies()
 
-    # Compute the intensity given BGR values of a pixel
+    # Compute the intensity given BGR values of a pixel.
     @staticmethod
     def intensity(pixelColors):
         return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
 
-    # Compute the gradient of the pixel at (x,y)
+    # Compute the gradient of the pixel at (x,y).
     # c_lost : list of 6 coordinates (a,b) to get the pixel on top, right, left etc.
     def gradient(self, x, y, c_list):
         v = []
@@ -60,15 +50,16 @@ class EnergyCalculator:
 
         return v[0] + v[1] * 2 + v[2] - v[3] - v[4] * 2 - v[5]
 
-    # Compute the energy of a pixel at (x,y)
+    # Compute the energy of a pixel at (x,y).
     def energy(self, x, y):
         gx, gy = self.gradient(x, y, self.GX_COORDS), self.gradient(x, y, self.GY_COORDS)
         res = math.sqrt(gx ** 2 + gy ** 2)
         return res
 
-    # Compute the energy of each pixel in the image
+    # Compute the energy of each pixel in the image.
     @timer
     def compute_energies(self):
+
         # Function calls and variables in local variables for better efficiency
         energy_computed = self.energyComputed
         energy = self.energy
@@ -78,8 +69,9 @@ class EnergyCalculator:
                 energy_computed[x][y] = int(energy(x,y))
 
     # Remove a vertical seam in the image.
-    # c : coordinates (a,b) used to easily adapt the direction
+    # c : coordinates (a,b) used to easily adapt the direction.
     def remove_vertical_seam(self, path, c=(1,0)):
+
         # Function calls and variables in local variables for better efficiency
         energy_computed = self.energyComputed
 
