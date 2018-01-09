@@ -34,7 +34,6 @@ class SeamFinder:
                 grid[x][y] = (e + energy_computed[x][y], (x2, y2))
 
 
-
     def avg_x_range(self):
         if self.previous_avg_x == 0:
             return range(1, self.image.w-1)
@@ -111,16 +110,14 @@ class SeamFinder:
 
     @timer
     def remove_vertical_seam(self, path):
+        if self.previous_avg_x > self.image.w // 2:
+            k = 1
+            i = self.image.w - 1
+        else:
+            k = -1
+            i = 0
         for (x,y) in path:
-            if self.previous_avg_x > self.image.w // 2:
-                r = range(x, self.image.w)
-                k = 1
-                i = self.image.w - 1
-            else:
-                r = range(0, x)
-                k = -1
-                i = 0
-            for i in r:
+            for i in range(max(0,x),min(x,self.image.w)):
                 self.grid[i+k][y] = self.grid[i+k][y]
         self.grid.pop(i)
         self.energyCalculator.remove_vertical_seam(path)
