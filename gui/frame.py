@@ -71,6 +71,18 @@ class Frame:
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
         #self.image_information_label.pack()
 
+        """
+        self.core.set_image("resources/pictures/trees.jpg")
+        self.auto_finder(25)
+        self.core.set_image("resources/pictures/pont.jpg")
+        self.auto_finder(25)
+        self.core.set_image("resources/pictures/ski.jpg")
+        self.auto_finder(25)
+        import time
+        time.sleep(2)
+        exit()
+        """
+    
         self.frame.mainloop()
 
     # Displays a window to select a jpg image
@@ -93,7 +105,7 @@ class Frame:
         self.current_image = self.core.get_image()
 
         # The minimum size is restricted by the size of the image
-        self.frame.minsize(self.core.w()-1,self.core.h()+200-1)
+        self.frame.minsize(self.core.w()-1,self.core.h()+100-1)
 
         # We adjust the size of the canvas to the image
         self.canvas.configure(width=self.core.w(), height=self.core.h())
@@ -105,7 +117,7 @@ class Frame:
     @timer
     def on_resize(self, event):
         if self.core.w() != False and self.canvas.winfo_width() < self.core.w():
-            pl = self.core.stupid_seam_finder(b=False)
+            pl = self.core.seam_finder()
             self.core.remove_vertical_seam(pl["path"])
             self.update()
             for p in pl["path"]:
