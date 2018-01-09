@@ -19,7 +19,7 @@ class EnergyCalculator:
     GX_COORDS = [(-1, -1), (-1, 0), (-1, 1), (1, -1), (1, 0), (1, 1)]
     GY_COORDS = [(-1, -1), (0, -1), (1, -1), (-1, 1), (0, 1), (1, 1)]
 
-    #High energy value
+    # High energy value
     HIGHT_ENERGY_VALUE = 2**10
 
     def __init__(self, image):
