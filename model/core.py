@@ -39,6 +39,14 @@ class Core:
     def h(self):
         return self.image.h
 
+    @check_image
+    def get_algo_type(self):
+        return self.seamFinder.algo_type
+
+    @check_image
+    def set_algo_type(self, algo_type):
+        self.seamFinder.algo_type = algo_type
+
     # Delegated method
     # @see SeamFinder.seam_finder for more details.
     @check_image

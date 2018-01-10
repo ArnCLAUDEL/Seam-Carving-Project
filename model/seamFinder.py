@@ -9,6 +9,7 @@ class SeamFinder:
 
         # Object that will provide the energies.
         self.energyCalculator = ec.EnergyCalculator(image)
+        energy_computed = self.energyCalculator.energyComputed
 
         # Grid that will contain, for each pixel, a tuple (seam_energy, (x2,y2)).
         # seam_energy : The energy of the lowest-cost seam that ends to this pixel.
@@ -21,6 +22,8 @@ class SeamFinder:
         # It represents the average of the x-part of each pixel coordinate (x,y) that belongs to the seam.
         # @check SeamFinder.compute_paths documentation for more details.
         self.previous_avg_x = 0
+
+        self.algo_type = 1
 
     # Compute, for each pixel, the next pixel to follow to build the lowest-cost vertical seam.
     # This algorithm uses dynamic programming to compute it in a reasonable delay.
@@ -44,11 +47,17 @@ class SeamFinder:
         for x in self.avg_x_range():
             grid[x][0] = (energy_computed[x][0], (-1,-1))
 
+        if self.algo_type == 1:
+            f = lambda i, j: (grid[i - 1][j - 1][0], grid[i][j - 1][0], grid[i + 1][j - 1][0])
+        else:
+            f = lambda i, j: (energy_computed[i - 1][j - 1], energy_computed[i][j - 1], energy_computed[i + 1][j - 1])
+
+        print(self.algo_type, f)
         for y in range(1, self.image.h - 1):
             for x in self.avg_x_range():
 
                 # Energy of the three upper pixels
-                e1, e2, e3 = grid[x - 1][y - 1][0], grid[x][y - 1][0], grid[x + 1][y - 1][0]
+                e1, e2, e3 = f(x,y)
                 e = min(e1, e2, e3)
 
                 # We retrieve the coordinates of the lowest energy

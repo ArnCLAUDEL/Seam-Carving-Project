@@ -52,6 +52,9 @@ class Frame:
         self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
         self.refresh_button.pack()
 
+        self.switch_algo_button = tkinter.Button(self.frame, text="Switch Algorithm", command=self.switch_algo)
+        self.switch_algo_button.pack()
+
         # # Canvas
 
         # Canvas that will contain the image
@@ -71,7 +74,7 @@ class Frame:
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
         #self.image_information_label.pack()
 
-
+        """
         self.core.set_image("resources/pictures/trees.jpg")
         self.auto_finder(25)
         self.core.set_image("resources/pictures/pont.jpg")
@@ -81,7 +84,7 @@ class Frame:
         import time
         time.sleep(2)
         exit()
-
+        """
         self.frame.mainloop()
 
     # Displays a window to select a jpg image
@@ -131,3 +134,11 @@ class Frame:
     # Resize the image with the given value
     def resize_image_width(self, value):
         self.canvas.configure(width=self.canvas.winfo_width() + value)
+
+    def switch_algo(self):
+        if self.core.get_algo_type() == 1:
+            new_algo_type = 2
+        else:
+            new_algo_type = 1
+        self.core.set_algo_type(new_algo_type)
+        print("algo type changed", new_algo_type, "current", self.core.get_algo_type)
