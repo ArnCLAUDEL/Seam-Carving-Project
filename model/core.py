@@ -60,3 +60,5 @@ class Core:
     def remove_vertical_seam(self, path):
         self.image.remove_vertical_seam(path)
         self.seamFinder.remove_vertical_seam(path)
+
+

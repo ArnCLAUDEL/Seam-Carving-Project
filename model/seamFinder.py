@@ -1,7 +1,11 @@
+import math
+from itertools import chain
+
 import model.energyCalculator as ec
 from model.seamCarvingUtil import timer
-from itertools import chain
-import math
+
+from model.algoType import AlgoType
+
 class SeamFinder:
 
     def __init__(self, image):
@@ -9,7 +13,6 @@ class SeamFinder:
 
         # Object that will provide the energies.
         self.energyCalculator = ec.EnergyCalculator(image)
-        energy_computed = self.energyCalculator.energyComputed
 
         # Grid that will contain, for each pixel, a tuple (seam_energy, (x2,y2)).
         # seam_energy : The energy of the lowest-cost seam that ends to this pixel.
@@ -23,7 +26,7 @@ class SeamFinder:
         # @check SeamFinder.compute_paths documentation for more details.
         self.previous_avg_x = 0
 
-        self.algo_type = 1
+        self.algo_type = AlgoType.SEAM_ENERGY
 
     # Compute, for each pixel, the next pixel to follow to build the lowest-cost vertical seam.
     # This algorithm uses dynamic programming to compute it in a reasonable delay.
@@ -47,7 +50,7 @@ class SeamFinder:
         for x in self.avg_x_range():
             grid[x][0] = (energy_computed[x][0], (-1,-1))
 
-        if self.algo_type == 1:
+        if self.algo_type == AlgoType.SEAM_ENERGY:
             f = lambda i, j: (grid[i - 1][j - 1][0], grid[i][j - 1][0], grid[i + 1][j - 1][0])
         else:
             f = lambda i, j: (energy_computed[i - 1][j - 1], energy_computed[i][j - 1], energy_computed[i + 1][j - 1])

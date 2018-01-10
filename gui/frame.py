@@ -1,4 +1,5 @@
 import model.image as img
+from model.algoType import AlgoType
 import numpy
 import tkinter
 
@@ -46,14 +47,21 @@ class Frame:
 
         # Button used to increase the width by 1px
         self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image_width(1))
-        self.increase_width.pack(side="left");
+        self.increase_width.pack(side="left")
 
         # Button used to refresh the image
         self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
         self.refresh_button.pack()
 
-        self.switch_algo_button = tkinter.Button(self.frame, text="Switch Algorithm", command=self.switch_algo)
-        self.switch_algo_button.pack()
+        self.switches_buttons = tkinter.Frame(self.frame)
+        self.switches_buttons.pack()
+
+        self.switch_seam_energy_button = tkinter.Button(self.switches_buttons, text="SEAM ENERGY", command=lambda: self.switch_algo(AlgoType.SEAM_ENERGY))
+        self.switch_seam_energy_button.pack(side="left")
+
+        self.switch_local_energy_button = tkinter.Button(self.switches_buttons, text="LOCAL ENERGY", command=lambda: self.switch_algo(AlgoType.LOCAL_ENERGY))
+        self.switch_local_energy_button.pack(side="left")
+
 
         # # Canvas
 
@@ -74,7 +82,7 @@ class Frame:
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
         #self.image_information_label.pack()
 
-        """
+
         self.core.set_image("resources/pictures/trees.jpg")
         self.auto_finder(25)
         self.core.set_image("resources/pictures/pont.jpg")
@@ -84,7 +92,7 @@ class Frame:
         import time
         time.sleep(2)
         exit()
-        """
+
         self.frame.mainloop()
 
     # Displays a window to select a jpg image
@@ -135,10 +143,11 @@ class Frame:
     def resize_image_width(self, value):
         self.canvas.configure(width=self.canvas.winfo_width() + value)
 
-    def switch_algo(self):
-        if self.core.get_algo_type() == 1:
-            new_algo_type = 2
+    def switch_algo(self, algo_type):
+        self.core.set_algo_type(algo_type)
+        if algo_type == AlgoType.SEAM_ENERGY:
+            self.switch_seam_energy_button.config(relief="sunken")
+            self.switch_local_energy_button.config(relief="raised")
         else:
-            new_algo_type = 1
-        self.core.set_algo_type(new_algo_type)
-        print("algo type changed", new_algo_type, "current", self.core.get_algo_type)
+            self.switch_local_energy_button.config(relief="sunken")
+            self.switch_seam_energy_button.config(relief="raised")
