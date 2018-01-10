@@ -10,7 +10,7 @@ class EnergyCalculator:
     GY_COORDS = [(-1, -1), (0, -1), (1, -1), (-1, 1), (0, 1), (1, 1)]
 
     # High energy value
-    HIGHT_ENERGY_VALUE = 2**10
+    HIGHT_ENERGY_VALUE = 2**20
 
     def __init__(self, image):
         self.image = image
