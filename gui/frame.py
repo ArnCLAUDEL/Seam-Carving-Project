@@ -71,7 +71,7 @@ class Frame:
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
         #self.image_information_label.pack()
 
-        """
+
         self.core.set_image("resources/pictures/trees.jpg")
         self.auto_finder(25)
         self.core.set_image("resources/pictures/pont.jpg")
@@ -81,13 +81,12 @@ class Frame:
         import time
         time.sleep(2)
         exit()
-        """
-    
+
         self.frame.mainloop()
 
     # Displays a window to select a jpg image
     def load(self):
-        file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")])
+        file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")], initialdir="resources/pictures")
 
         if file:
             self.user_message.set("We are pre-processing your image")
@@ -121,7 +120,8 @@ class Frame:
             self.core.remove_vertical_seam(pl["path"])
             self.update()
             for p in pl["path"]:
-                self.canvas .create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
+                self.canvas.create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
+
 
     def auto_finder(self, value):
         for i in range(value):
