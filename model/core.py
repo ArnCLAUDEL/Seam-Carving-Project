@@ -40,6 +40,14 @@ class Core:
         return self.image.h
 
     @check_image
+    def get_accuracy(self):
+        return self.seamFinder.accuracy
+
+    @check_image
+    def set_accuracy(self, accuracy):
+        self.seamFinder.accuracy = accuracy
+
+    @check_image
     def get_algo_type(self):
         return self.seamFinder.algo_type
 

@@ -62,6 +62,8 @@ class Frame:
         self.switch_local_energy_button = tkinter.Button(self.switches_buttons, text="LOCAL ENERGY", command=lambda: self.switch_algo(AlgoType.LOCAL_ENERGY))
         self.switch_local_energy_button.pack(side="left")
 
+        self.accuracy_scale = tkinter.Scale(self.frame, from_=0.1, to=1, resolution=0.1, orient="horizontal", command=self.set_accuracy)
+        self.accuracy_scale.pack()
 
         # # Canvas
 
@@ -82,7 +84,7 @@ class Frame:
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
         #self.image_information_label.pack()
 
-
+        """
         self.core.set_image("resources/pictures/trees.jpg")
         self.auto_finder(25)
         self.core.set_image("resources/pictures/pont.jpg")
@@ -92,7 +94,7 @@ class Frame:
         import time
         time.sleep(2)
         exit()
-
+        """
         self.frame.mainloop()
 
     # Displays a window to select a jpg image
@@ -103,10 +105,10 @@ class Frame:
             self.user_message.set("We are pre-processing your image")
             self.frame.update()
             self.core.set_image(file)
+            self.switch_algo(self.core.get_algo_type())
+            self.accuracy_scale.set(self.core.get_accuracy())
             self.user_message.set("")
             self.update()
-        else:
-            self.user_message.set("Load an image to start.")
 
     # Update the frame, the image and its information
     def update(self):
@@ -142,6 +144,9 @@ class Frame:
     # Resize the image with the given value
     def resize_image_width(self, value):
         self.canvas.configure(width=self.canvas.winfo_width() + value)
+
+    def set_accuracy(self, event):
+        self.core.set_accuracy(self.accuracy_scale.get())
 
     def switch_algo(self, algo_type):
         self.core.set_algo_type(algo_type)

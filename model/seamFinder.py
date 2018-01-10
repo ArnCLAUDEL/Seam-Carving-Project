@@ -28,6 +28,8 @@ class SeamFinder:
 
         self.algo_type = AlgoType.SEAM_ENERGY
 
+        self.accuracy = 0.3
+
     # Compute, for each pixel, the next pixel to follow to build the lowest-cost vertical seam.
     # This algorithm uses dynamic programming to compute it in a reasonable delay.
     # Pixels in the first row are initialized just with their energies and dummy coordinates.
@@ -81,9 +83,9 @@ class SeamFinder:
     def avg_x_range(self):
         if self.previous_avg_x == 0:
             return range(1, self.image.w-1)
-        i = max(1,self.previous_avg_x-self.image.w//3)
+        i = max(1,self.previous_avg_x-int(self.image.w*self.accuracy))
         j = self.image.w-1
-        k = max(j,self.image.w-1-self.image.w//10)
+        k = max(j,self.image.w-1-int(self.image.w*self.accuracy*0.5))
         return chain(range(i,j), range(k,self.image.w-1))
 
     # Find and return a low-energy seam.
