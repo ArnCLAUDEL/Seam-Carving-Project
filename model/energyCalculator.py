@@ -79,4 +79,11 @@ class EnergyCalculator:
         for (x,y) in path:
             for i in range(x,self.image.w):
                 energy_computed[i][y] = energy_computed[i+ix][y+iy]
+
         energy_computed.pop()
+
+    def avoid_pixel(self,x,y):
+        try:
+            self.energyComputed[x][y] = self.HIGHT_ENERGY_VALUE
+        except IndexError:
+            pass

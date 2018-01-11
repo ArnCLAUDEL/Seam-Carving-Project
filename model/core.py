@@ -69,4 +69,6 @@ class Core:
         self.image.remove_vertical_seam(path)
         self.seamFinder.remove_vertical_seam(path)
 
-
+    @check_image
+    def avoid_pixel(self, x, y):
+        self.seamFinder.avoid_pixel(x,y)

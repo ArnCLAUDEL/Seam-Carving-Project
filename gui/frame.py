@@ -49,9 +49,15 @@ class Frame:
         self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image_width(1))
         self.increase_width.pack(side="left")
 
+        self.canvas_buttons = tkinter.Frame(self.frame)
+        self.canvas_buttons.pack()
+
+        self.apply_draw_button = tkinter.Button(self.canvas_buttons, text="Apply", command=self.apply_draw)
+        self.apply_draw_button.pack(side="left")
+
         # Button used to refresh the image
-        self.refresh_button = tkinter.Button(self.frame, text="Refresh", command=self.update)
-        self.refresh_button.pack()
+        self.refresh_button = tkinter.Button(self.canvas_buttons    , text="Refresh", command=self.update)
+        self.refresh_button.pack(side="left")
 
         self.switches_buttons = tkinter.Frame(self.frame)
         self.switches_buttons.pack()
@@ -65,14 +71,18 @@ class Frame:
         self.accuracy_scale = tkinter.Scale(self.frame, from_=0.1, to=1, resolution=0.1, orient="horizontal", command=self.set_accuracy)
         self.accuracy_scale.pack()
 
+        self.pixels = list()
+
         # # Canvas
 
         # Canvas that will contain the image
         self.canvas = tkinter.Canvas(self.frame, width=100, height=100, highlightthickness=0)
+
         self.canvas .pack(expand=1)
 
         # Callback when the size of the windows changes
         self.canvas.bind("<Configure>", self.on_resize)
+        self.canvas.bind("<B1-Motion>", self.draw)
 
         # # Labels
 
@@ -156,3 +166,17 @@ class Frame:
         else:
             self.switch_local_energy_button.config(relief="sunken")
             self.switch_seam_energy_button.config(relief="raised")
+
+    def apply_draw(self):
+        for (x,y) in self.pixels:
+            self.core.avoid_pixel(x,y)
+        self.pixels = list()
+
+    def draw(self, event):
+        x,y = event.x,event.y
+        self.canvas.create_rectangle(x - 10, y - 10, x+10, y+10,fill="white",outline="white")
+        for x2 in range(x - 10, x+10):
+            for y2 in range(y -10, y +10):
+                self.pixels.append((x2, y2))
+
+

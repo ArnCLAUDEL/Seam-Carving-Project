@@ -49,35 +49,19 @@ class Image:
         self.update_size()
 
     #TODO
+    @timer
     def remove_horizontal_seam(self, path):
-        gridTemp = list()
-        for i in range(0, self.w):
-            gridTemp.append([])
-            for j in range(0, self.h-1):
-                gridTemp[i].append(self.grid[j,i])
 
-        gridTemp = numpy.array(gridTemp)
-        ndarrays = list()
-
-        ndarrays.append(numpy.delete(gridTemp[path[0][0]], path[0][1], 0))
-
-        for p in path:
-            try:
-                ndarrays.append(numpy.delete(gridTemp[p[0]], p[1], 0))
-            except IndexError:
-                print(gridTemp.shape, p[1],p[0])
-        ndarrays.append(numpy.delete(gridTemp[path[len(path) -1][0]], path[len(path) - 1][1], 0))
-        ndarrays = numpy.array(ndarrays)
-
-        #print(ndarrays.shape)
-
-        gridTemp = list()
-        for i in range(0, self.h-1):
-            gridTemp.append([])
-            for j in range(0, self.w):
-                gridTemp[i].append(self.grid[i,j])
-
-
-        self.grid = numpy.array(gridTemp)
-
+        for (x, y) in path:
+            for i in range(y):
+                self.grid[y][i] = self.grid[y+1][i]
+        print(self.grid.shape)
+        self.grid = numpy.delete(self.grid,self.h-1,1)
+        print(self.grid.shape)
         self.update_size()
+
+    def set_pixel_intensity(self, x, y, bgr_list):
+        try :
+            self.grid[y][x] = bgr_list
+        except IndexError:
+            pass
