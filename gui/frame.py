@@ -12,28 +12,23 @@ class Frame:
         self.frame = tkinter.Tk()
         self.core = core
         self.current_image = None
-        self.__initialize()
+        self.pixels = list()
+        self.__build()
+        self.frame.mainloop()
 
-    def __initialize(self):
+    def __build(self):
         self.frame.title("Seam Carver")
+        self.__build_header()
+        self.__build_body()
+        self.__build_footer()
 
-        # # StringVars
-
-        # StringVar with image information
-        self.image_information = tkinter.StringVar()
-        self.image_information.set("NONE")
-
-        # StringVar with a message for the user
-        self.user_message= tkinter.StringVar()
-        self.user_message.set("Load an image to start.")
-
-        # # Buttons
+    def __build_header(self):
 
         # Button used to load a new image
         self.load_button = tkinter.Button(self.frame, text="Load", command=self.load)
         self.load_button.pack()
 
-        # Frame that will contain buttons for resizing
+        # Frame that will contain buttons to resize the image
         self.resize_buttons = tkinter.Frame(self.frame)
         self.resize_buttons.pack()
 
@@ -49,65 +44,68 @@ class Frame:
         self.increase_width = tkinter.Button(self.resize_buttons, text="+", command=lambda: self.resize_image_width(1))
         self.increase_width.pack(side="left")
 
+        # Frame that will contain buttons to interact with the canvas
         self.canvas_buttons = tkinter.Frame(self.frame)
         self.canvas_buttons.pack()
 
+        # Button used to apply the drawing, pixels drawn will be avoided as much as possible
         self.apply_draw_button = tkinter.Button(self.canvas_buttons, text="Apply", command=self.apply_draw)
         self.apply_draw_button.pack(side="left")
 
         # Button used to refresh the image
-        self.refresh_button = tkinter.Button(self.canvas_buttons    , text="Refresh", command=self.update)
+        self.refresh_button = tkinter.Button(self.canvas_buttons, text="Refresh", command=self.update)
         self.refresh_button.pack(side="left")
 
+        # Frame that will contain buttons to set the algorithm
         self.switches_buttons = tkinter.Frame(self.frame)
         self.switches_buttons.pack()
 
-        self.switch_seam_energy_button = tkinter.Button(self.switches_buttons, text="SEAM ENERGY", command=lambda: self.switch_algo(AlgoType.SEAM_ENERGY))
+        # Button used to set the seam energy-based algorithm
+        self.switch_seam_energy_button = tkinter.Button(self.switches_buttons, text="SEAM ENERGY",
+                                                        command=lambda: self.switch_algo(AlgoType.SEAM_ENERGY))
         self.switch_seam_energy_button.pack(side="left")
 
-        self.switch_local_energy_button = tkinter.Button(self.switches_buttons, text="LOCAL ENERGY", command=lambda: self.switch_algo(AlgoType.LOCAL_ENERGY))
+        # Button used to set the local energy-based algorithm
+        self.switch_local_energy_button = tkinter.Button(self.switches_buttons, text="LOCAL ENERGY",
+                                                         command=lambda: self.switch_algo(AlgoType.LOCAL_ENERGY))
         self.switch_local_energy_button.pack(side="left")
 
-        self.accuracy_scale = tkinter.Scale(self.frame, from_=0.1, to=1, resolution=0.1, orient="horizontal", command=self.set_accuracy)
+        # Scale used to set the accuracy of the algorithm
+        self.accuracy_scale = tkinter.Scale(self.frame, from_=0.1, to=1, resolution=0.1, orient="horizontal",
+                                            command=self.set_accuracy)
         self.accuracy_scale.pack()
 
-        self.pixels = list()
-
-        # # Canvas
-
-        # Canvas that will contain the image
-        self.canvas = tkinter.Canvas(self.frame, width=100, height=100, highlightthickness=0)
-
-        self.canvas .pack(expand=1)
-
-        # Callback when the size of the windows changes
-        self.canvas.bind("<Configure>", self.on_resize)
-        self.canvas.bind("<B1-Motion>", self.draw)
-
-        # # Labels
+        # StringVar with a message for the user
+        self.user_message = tkinter.StringVar()
+        self.user_message.set("Load an image to start.")
 
         # Label that displays a message to the user
         self.user_message_label = tkinter.Label(self.frame, textvariable=self.user_message)
         self.user_message_label.pack()
 
+
+
+    def __build_body(self):
+
+        # Canvas that will contain the image
+        self.canvas = tkinter.Canvas(self.frame, width=100, height=100, highlightthickness=0)
+        self.canvas.pack(expand=1)
+
+        # Callback when the size of the windows changes
+        self.canvas.bind("<Configure>", self.on_resize)
+        self.canvas.bind("<B1-Motion>", self.draw)
+
+    def __build_footer(self):
+
+        # StringVar with image information
+        self.image_information = tkinter.StringVar()
+        self.image_information.set("NO IMAGE")
+
         # Label that displays image information
         self.image_information_label = tkinter.Label(self.frame, textvariable=self.image_information)
-        #self.image_information_label.pack()
+        self.image_information_label.pack()
 
-        """
-        self.core.set_image("resources/pictures/trees.jpg")
-        self.auto_finder(25)
-        self.core.set_image("resources/pictures/pont.jpg")
-        self.auto_finder(25)
-        self.core.set_image("resources/pictures/ski.jpg")
-        self.auto_finder(25)
-        import time
-        time.sleep(2)
-        exit()
-        """
-        self.frame.mainloop()
-
-    # Displays a window to select a jpg image
+    # Display a window to select a jpg image
     def load(self):
         file = askopenfilename(title="Select a picture", filetypes=[("jpeg files", "*.jpg")], initialdir="resources/pictures")
 
@@ -120,7 +118,7 @@ class Frame:
             self.user_message.set("")
             self.update()
 
-    # Update the frame, the image and its information
+    # Update all informations
     def update(self):
         # Image path + size
         self.image_information.set(self.core.image.path + " " + str(self.core.w()) + "x" + str(self.core.h()))
@@ -145,19 +143,21 @@ class Frame:
             for p in pl["path"]:
                 self.canvas.create_oval(p[0] - 0.5, p[1] - 0.5, p[0] + 0.5, p[1] + 0.5)
 
-
+    # Resize the image by the given value, update the frame after each step
     def auto_finder(self, value):
         for i in range(value):
             self.resize_image_width(-1)
             self.frame.update()
 
-    # Resize the image with the given value
+    # Resize the width of the image with the given value
     def resize_image_width(self, value):
         self.canvas.configure(width=self.canvas.winfo_width() + value)
 
+    # Set the accuracy of the algoritm
     def set_accuracy(self, event):
         self.core.set_accuracy(self.accuracy_scale.get())
 
+    # Switch the current algorithm to the given one
     def switch_algo(self, algo_type):
         self.core.set_algo_type(algo_type)
         if algo_type == AlgoType.SEAM_ENERGY:
@@ -167,11 +167,13 @@ class Frame:
             self.switch_local_energy_button.config(relief="sunken")
             self.switch_seam_energy_button.config(relief="raised")
 
+    # Apply the drawing, pixels will be avoided as much as possible
     def apply_draw(self):
         for (x,y) in self.pixels:
             self.core.avoid_pixel(x,y)
         self.pixels = list()
 
+    # Callback that allows the user to draw on the canvas, this just stores pixels drawn
     def draw(self, event):
         x,y = event.x,event.y
         self.canvas.create_rectangle(x - 10, y - 10, x+10, y+10,fill="white",outline="white")
