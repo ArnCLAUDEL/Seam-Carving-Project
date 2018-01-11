@@ -21,8 +21,6 @@ class EnergyCalculator:
         # Tab with the intensity of each pixel. Initial value : an arbitrary high energy value
         self.energyComputed = [[self.HIGHT_ENERGY_VALUE for y in range(self.image.h)] for x in range(self.image.w)]
 
-        # loop = asyncio.get_event_loop()
-        # loop.run_in_executor(None, self.pre_process)
         self.pre_process()
 
     # Pre-process the image.
@@ -37,7 +35,7 @@ class EnergyCalculator:
         return int(pixelColors[0]) + int(pixelColors[1]) + int(pixelColors[2])
 
     # Compute the gradient of the pixel at (x,y).
-    # c_lost : list of 6 coordinates (a,b) to get the pixel on top, right, left etc.
+    # c_lost : list of 6 coordinates (a,b) to get the pixel on top-left, top, top-right etc.
     def gradient(self, x, y, c_list):
         v = []
         for c in c_list:

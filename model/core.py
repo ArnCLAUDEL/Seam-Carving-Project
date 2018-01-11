@@ -39,18 +39,22 @@ class Core:
     def h(self):
         return self.image.h
 
+    # Return the accuracy of the algorithm
     @check_image
     def get_accuracy(self):
         return self.seamFinder.accuracy
 
+    # Set the accuracy of the algoritm with the given one
     @check_image
     def set_accuracy(self, accuracy):
         self.seamFinder.accuracy = accuracy
 
+    # Return the current algorithm
     @check_image
     def get_algo_type(self):
         return self.seamFinder.algo_type
 
+    # Set the current algorithm with the given one
     @check_image
     def set_algo_type(self, algo_type):
         self.seamFinder.algo_type = algo_type
@@ -69,6 +73,7 @@ class Core:
         self.image.remove_vertical_seam(path)
         self.seamFinder.remove_vertical_seam(path)
 
+    # The given pixel will be avoided in computation as much as possible
     @check_image
     def avoid_pixel(self, x, y):
         self.seamFinder.avoid_pixel(x,y)

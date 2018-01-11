@@ -4,22 +4,23 @@ import numpy
 import PIL.Image as pimg
 import PIL.ImageTk as pimgtk
 
-def timer(f):
-    def f_timer(self, *args, **kwargs):
-        start = time.time()
-        res = f(self, *args, **kwargs)
-        end = time.time()
-        print(f, "done in", round((end - start), 2), "s")
-        return res
-    return f_timer
-
 class Image:
 
     def __init__(self, path):
+
+        # Image path
         self.path = path
+
+        # Grid which contains the image
+        # [height][width][[Blue] [Green] [Red]]
         self.grid = cv2.imread(self.path)
+
+        # Width
         self.w = 0
+
+        # Height
         self.h = 0
+
         self.update_size()
 
     # Re-compute the width and height of the image using the grid
@@ -27,7 +28,7 @@ class Image:
         self.w = len(self.grid[0])
         self.h = len(self.grid)
 
-    # Return the BGR values of the pixel (x,y)
+    # Return the BGR values of the pixel (x,y) as a list
     def get(self, x, y):
         return self.grid[y][x]
 
@@ -48,20 +49,9 @@ class Image:
         self.grid = numpy.array(ndarrays)
         self.update_size()
 
-    #TODO
-    @timer
-    def remove_horizontal_seam(self, path):
-
-        for (x, y) in path:
-            for i in range(y):
-                self.grid[y][i] = self.grid[y+1][i]
-        print(self.grid.shape)
-        self.grid = numpy.delete(self.grid,self.h-1,1)
-        print(self.grid.shape)
-        self.update_size()
-
+    # Set the intensity of the pixel (x,y) with the given BGR values
     def set_pixel_intensity(self, x, y, bgr_list):
         try :
             self.grid[y][x] = bgr_list
         except IndexError:
-            pass
+            return False

@@ -12,8 +12,13 @@ class Frame:
         self.frame = tkinter.Tk()
         self.core = core
         self.current_image = None
+
+        # List that will contains drawn on the canvas
         self.pixels = list()
+
+        # Build the gui
         self.__build()
+
         self.frame.mainloop()
 
     def __build(self):
@@ -176,7 +181,7 @@ class Frame:
     # Callback that allows the user to draw on the canvas, this just stores pixels drawn
     def draw(self, event):
         x,y = event.x,event.y
-        self.canvas.create_rectangle(x - 10, y - 10, x+10, y+10,fill="white",outline="white")
+        self.canvas.create_oval(x - 10, y - 10, x+10, y+10,fill="white",outline="white")
         for x2 in range(x - 10, x+10):
             for y2 in range(y -10, y +10):
                 self.pixels.append((x2, y2))
